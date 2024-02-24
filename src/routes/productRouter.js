@@ -18,7 +18,9 @@ router.get('/', async (req, res) => {
         res.setHeader('Content-Type','application/json');
         return res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: 'Error al obtener productos' });
+        res.status(500).json({
+            error: 'Error al obtener los productos' 
+        });
     }
 });
 
@@ -39,7 +41,9 @@ router.get('/:pid', async (req, res) => {
         return res.status(200).json(product);
         
     } catch (error) {
-        res.status(500).send({ error: 'Error al obtener el producto' });
+        res.status(500).json({
+            error: `Error al obtener el producto con id ${pid}` 
+        });
     }
 });
 
@@ -68,10 +72,35 @@ router.post('/', async (req, res) => {
 
         res.status(201).json({ message: 'Producto creado exitosamente' });
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: 'Error al crear el producto' });
+        res.status(500).json({
+            error: 'Error al crear un nuevo producto' 
+        });
     }
 })
 
+router.put('/:pid', async (req, res) => {
+    try {
+        const { pid } = req.params;
+        const { title, description, price, thumbnail, code, stock, status, category } = req.body;
+
+        const productId = Number(pid);
+        if (isNaN(productId)) {
+            return res.status(400).json({ error: 'El id debe ser numérico' });
+        }
+        
+        const result = await pm.updateProduct(productId, { title, description, price, thumbnail, code, stock, status, category });
+
+        if (result.error) {
+            return res.status(404).json({ error: result.error });
+        }
+        await pm.updateProduct(productId, { title, description, price, thumbnail, code, stock, status, category });
+
+        res.status(200).json({ message: 'Producto actualizado con éxito' });
+    } catch (error) {
+        res.status(500).json({
+            error: `Error al actualizar el producto con id ${pid}` 
+        });
+    }
+});
 
 module.exports = router

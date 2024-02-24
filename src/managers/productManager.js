@@ -50,29 +50,24 @@ class ProductManager{
         }
     }
 
-    async updateProduct(id, fieldToUpdate, value) {
+    async updateProduct(id, updatedFields) {
         try {
             let products = await this.getProducts();
     
-            let productIndex = -1;
-    
-            let updatedProduct = products.map((p, index) => {
-                if (p.id === id) {
-                    p[fieldToUpdate] = value;
-                    productIndex = index; // Guarda el índice del producto encontrado
-                }
-                return p;
-            });
+            const productIndex = products.findIndex(p => p.id === id);
     
             if (productIndex === -1) {
-                console.log(`No se encontró un producto con id ${id}`);
-                return;
+                return { error: `No existe producto con id: ${id}` };
             }
     
-            await fs.promises.writeFile(this.path, JSON.stringify(updatedProduct, null, 2), 'utf-8');
-            console.log(`Producto con id ${id} actualizado correctamente.`);
+            // Actualiza los campos proporcionados
+            products[productIndex] = { ...products[productIndex], ...updatedFields };
+    
+            await fs.promises.writeFile(this.path, JSON.stringify(products, null, 2), 'utf-8');
+    
+            return { message: `Producto con id ${id} actualizado correctamente.` };
         } catch (error) {
-            console.log(`Error al actualizar el producto con id ${id}: ${error.message}`);
+            throw error;
         }
     }
 
