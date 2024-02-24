@@ -88,5 +88,15 @@
           "thumbnail": "nespresso_vertuo.jpg",
           "code": "NVERT001",
           "stock": 30
+     },
+     {
+          "id": 11,
+          "title": "Nombre del Producto",
+          "description": "Descripción del Producto",
+          "price": 10.99,
+          "code": "ssdas",
+          "stock": 50,
+          "status": true,
+          "category": "Categoría del Producto"
      }
 ]

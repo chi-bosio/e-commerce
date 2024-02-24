@@ -5,26 +5,15 @@ class ProductManager{
         this.path = path
     }
 
-    async addProduct(title, description, price, thumbnail, code, stock){
+    async addProduct(title, description, price, thumbnail, code, stock, status = true, category){
         let products = await this.getProducts()
 
         try {
-            let exist = products.find(product => product.code === code)
-            if(exist){
-                console.log(`El producto con code ${code} ya existe...!!`);
-                return
-            }
-
-            if (!title || !description || !price || !thumbnail || !code || !stock) {
-                console.log("Todos los campos son obligatorios")
-                return
-            }
-
             let id = 1
             if(products.length > 0){
                 id = products[products.length -1].id +1
             }
-            let newProduct = {id, title, description, price, thumbnail, code, stock}
+            let newProduct = {id, title, description, price, thumbnail, code, stock, status, category}
             products.push(newProduct)
 
             await fs.promises.writeFile(this.path, JSON.stringify(products, null, 5))
@@ -43,6 +32,7 @@ class ProductManager{
         }
         
     }
+
 
     async getProductById(id){
 
@@ -107,4 +97,4 @@ class ProductManager{
     }
 }
 
-module.exports = ProductManager;
+module.exports = ProductManager
