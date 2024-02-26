@@ -19,7 +19,7 @@ class ProductManager{
             await fs.promises.writeFile(this.path, JSON.stringify(products, null, 5))
             
         } catch (error) {
-            console.log(error.message);
+            throw error;
         }
         
     }
@@ -33,7 +33,6 @@ class ProductManager{
         
     }
 
-
     async getProductById(id){
 
         try {
@@ -45,8 +44,7 @@ class ProductManager{
             }
             return product
         } catch (error) {
-            console.log(error.message);
-            throw error
+            throw error;
         }
     }
 
@@ -60,7 +58,6 @@ class ProductManager{
                 return { error: `No existe producto con id: ${id}` };
             }
     
-            // Actualiza los campos proporcionados
             products[productIndex] = { ...products[productIndex], ...updatedFields };
     
             await fs.promises.writeFile(this.path, JSON.stringify(products, null, 2), 'utf-8');
@@ -82,12 +79,9 @@ class ProductManager{
                 products.splice(index, 1);
     
                 await fs.promises.writeFile(this.path, JSON.stringify(products, null, 2), 'utf-8');
-                console.log(`El producto con id ${id} se eliminó con éxito!!`);
-            } else {
-                console.log(`No se encontró un producto con id ${id}.`);
             }
         } catch (error) {
-            console.error(`Error al eliminar el producto con id ${id}: ${error.message}`);
+            throw error;
         }
     }
 }

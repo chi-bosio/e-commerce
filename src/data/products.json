@@ -1,23 +1,5 @@
 [
   {
-    "id": 1,
-    "title": "Dell XPS 13",
-    "description": "Ultrabook con pantalla InfinityEdge",
-    "price": 1299.99,
-    "thumbnail": "dell_xps13.jpg",
-    "code": "DXPS13",
-    "stock": 50
-  },
-  {
-    "id": 2,
-    "title": "iPhone 13",
-    "description": "Teléfono inteligente de última generación de Apple",
-    "price": 799.99,
-    "thumbnail": "iphone_13.jpg",
-    "code": "IPH13",
-    "stock": 30
-  },
-  {
     "id": 3,
     "title": "Nike Air Max",
     "description": "Zapatillas deportivas con tecnología de amortiguación",
@@ -85,11 +67,5 @@
     "thumbnail": "nespresso_vertuo.jpg",
     "code": "NVERT001",
     "stock": 30
-  },
-  {
-    "id": 11,
-    "title": "Nuevo Nombre del Producto",
-    "price": 15.99,
-    "stock": 75
   }
 ]

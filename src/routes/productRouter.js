@@ -80,12 +80,14 @@ router.post('/', async (req, res) => {
 
 router.put('/:pid', async (req, res) => {
     try {
-        const { pid } = req.params;
+        let { pid } = req.params;
         const { title, description, price, thumbnail, code, stock, status, category } = req.body;
 
-        const productId = Number(pid);
-        if (isNaN(productId)) {
-            return res.status(400).json({ error: 'El id debe ser numérico' });
+        pid = Number(pid);
+        if (isNaN(pid)) {
+            return res.status(400).json({
+                error: 'El id debe ser del tipo numérico'
+            });
         }
         
         const result = await pm.updateProduct(productId, { title, description, price, thumbnail, code, stock, status, category });
@@ -102,5 +104,29 @@ router.put('/:pid', async (req, res) => {
         });
     }
 });
+
+router.delete('/:pid', async (req, res) => {
+    try {
+        let { pid } = req.params;
+        pid = Number(pid);
+        if (isNaN(pid)) {
+            return res.status(400).json({
+                error: 'El id debe ser del tipo numérico'
+            });
+        }
+
+        const result = await pm.deleteProduct(pid);
+
+        if (result.error) {
+            return res.status(404).json({ error: result.error });
+        }
+
+        res.status(200).json({ message: 'Producto eliminado con éxito!!' });
+    } catch (error) {
+        res.status(500).json({
+            error: `Error al eliminar el producto con id ${pid}` 
+        });
+    }
+})
 
 module.exports = router
