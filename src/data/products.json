@@ -1,32 +1,5 @@
 [
   {
-    "id": 3,
-    "title": "Nike Air Max",
-    "description": "Zapatillas deportivas con tecnología de amortiguación",
-    "price": 129.99,
-    "thumbnail": "nike_air_max.jpg",
-    "code": "NAM001",
-    "stock": 100
-  },
-  {
-    "id": 4,
-    "title": "Canon EOS R5",
-    "description": "Cámara mirrorless con grabación de video 8K",
-    "price": 3599.99,
-    "thumbnail": "canon_eos_r5.jpg",
-    "code": "CEOSR5",
-    "stock": 15
-  },
-  {
-    "id": 5,
-    "title": "Cien años de soledad",
-    "description": "Novela del autor Gabriel García Márquez",
-    "price": 19.99,
-    "thumbnail": "cien_anos_soledad.jpg",
-    "code": "CAS001",
-    "stock": 50
-  },
-  {
     "id": 6,
     "title": "Herman Miller Aeron",
     "description": "Silla ergonómica para oficina",
@@ -60,12 +33,14 @@
     "stock": 75
   },
   {
-    "id": 10,
-    "title": "Nespresso Vertuo",
-    "description": "Cafetera de cápsulas con sistema de centrifugado",
-    "price": 149.99,
-    "thumbnail": "nespresso_vertuo.jpg",
-    "code": "NVERT001",
-    "stock": 30
+    "id": 11,
+    "title": "Nike Air Max 2",
+    "description": "Zapatillas deportivas con tecnología de amortiguación",
+    "price": 129.99,
+    "thumbnail": "nike_air_max2.jpg",
+    "code": "NAM002",
+    "stock": 50,
+    "status": true,
+    "category": "Categoría Predeterminada"
   }
 ]
