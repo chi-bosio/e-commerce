@@ -115,11 +115,14 @@ router.delete('/:pid', async (req, res) => {
             });
         }
 
-        const result = await pm.deleteProduct(pid);
+        let products = await pm.getProducts(); // Asegúrate de utilizar await para obtener los productos de manera asíncrona
+        let indexProduct = products.findIndex(u => u.id === pid);
 
-        if (result.error) {
-            return res.status(404).json({ error: result.error });
+        if (indexProduct === -1) {
+            return res.status(400).json({ error: `No existen productos con id ${pid}` });
         }
+
+        await pm.deleteProduct(pid);
 
         res.status(200).json({ message: 'Producto eliminado con éxito' });
     } catch (error) {

@@ -1,39 +1,28 @@
 [
   {
-    "id": 6,
-    "title": "Herman Miller Aeron",
-    "description": "Silla ergonómica para oficina",
-    "price": 899.99,
-    "thumbnail": "aeron_chair.jpg",
-    "code": "HMA001",
-    "stock": 20
-  },
-  {
-    "id": 7,
+    "id": 1,
     "title": "Catan",
     "description": "Juego de estrategia y comercio",
     "price": 49.99,
     "thumbnail": "catan_boardgame.jpg",
     "code": "CAT001",
-    "stock": 40
+    "stock": 40,
+    "status": true,
+    "category": "Juegos de Mesa"
   },
   {
-    "id": 8,
+    "id": 2,
     "title": "Rolex Submariner",
     "description": "Reloj de buceo de lujo",
     "price": 9999.99,
     "thumbnail": "rolex_submariner.jpg",
     "code": "RSUB001",
-    "stock": 10
+    "stock": 10,
+    "status": true,
+    "category": "Relojes"
   },
   {
-    "id": 9,
-    "title": "Nuevo Nombre del Producto",
-    "price": 15.99,
-    "stock": 75
-  },
-  {
-    "id": 11,
+    "id": 3,
     "title": "Nike Air Max 2",
     "description": "Zapatillas deportivas con tecnología de amortiguación",
     "price": 129.99,
@@ -41,6 +30,193 @@
     "code": "NAM002",
     "stock": 50,
     "status": true,
-    "category": "Categoría Predeterminada"
+    "category": "Calzado Deportivo"
+  },
+  {
+    "id": 4,
+    "title": "Sony PlayStation 5",
+    "description": "Consola de videojuegos de última generación",
+    "price": 499.99,
+    "thumbnail": "ps5_console.jpg",
+    "code": "PS501",
+    "stock": 20,
+    "status": true,
+    "category": "Electrónicos"
+  },
+  {
+    "id": 5,
+    "title": "Canon EOS R5",
+    "description": "Cámara digital de alta resolución",
+    "price": 2999.99,
+    "thumbnail": "canon_eos_r5.jpg",
+    "code": "CEOSR501",
+    "stock": 15,
+    "status": true,
+    "category": "Fotografía"
+  },
+  {
+    "id": 6,
+    "title": "MacBook Pro 2023",
+    "description": "Laptop potente con pantalla Retina",
+    "price": 2399.99,
+    "thumbnail": "macbook_pro_2023.jpg",
+    "code": "MBP202301",
+    "stock": 25,
+    "status": true,
+    "category": "Tecnología"
+  },
+  {
+    "id": 7,
+    "title": "Dungeons & Dragons Starter Set",
+    "description": "Kit de inicio para el juego de rol Dungeons & Dragons",
+    "price": 29.99,
+    "thumbnail": "dnd_starter_set.jpg",
+    "code": "DNDSS001",
+    "stock": 30,
+    "status": true,
+    "category": "Juegos de Rol"
+  },
+  {
+    "id": 8,
+    "title": "Samsung Galaxy S22",
+    "description": "Teléfono inteligente con cámara de alta calidad",
+    "price": 799.99,
+    "thumbnail": "samsung_galaxy_s22.jpg",
+    "code": "SGS2201",
+    "stock": 18,
+    "status": true,
+    "category": "Smartphones"
+  },
+  {
+    "id": 9,
+    "title": "Bose QuietComfort 45",
+    "description": "Auriculares con cancelación de ruido",
+    "price": 349.99,
+    "thumbnail": "bose_qc45.jpg",
+    "code": "BQC4501",
+    "stock": 22,
+    "status": true,
+    "category": "Audio"
+  },
+  {
+    "id": 10,
+    "title": "Lifeproof FRE Series Waterproof Case for iPhone",
+    "description": "Funda impermeable para iPhone",
+    "price": 49.99,
+    "thumbnail": "lifeproof_iphone_case.jpg",
+    "code": "dsaf",
+    "stock": 30,
+    "status": false,
+    "category": "Accesorios para Teléfonos"
+  },
+  {
+    "id": 11,
+    "title": "Fitbit Charge 5",
+    "description": "Rastreador de actividad física con monitor de ritmo cardíaco",
+    "price": 149.99,
+    "thumbnail": "fitbit_charge5.jpg",
+    "code": "FBTC501",
+    "stock": 20,
+    "status": true,
+    "category": "Salud y Bienestar"
+  },
+  {
+    "id": 12,
+    "title": "LEGO Technic Lamborghini Sián",
+    "description": "Set de construcción de automóvil de lujo",
+    "price": 379.99,
+    "thumbnail": "lego_lamborghini.jpg",
+    "code": "LEGOTL001",
+    "stock": 15,
+    "status": true,
+    "category": "Juguetes"
+  },
+  {
+    "id": 13,
+    "title": "KitchenAid Artisan Stand Mixer",
+    "description": "Batidora de pie para cocina",
+    "price": 349.99,
+    "thumbnail": "kitchenaid_mixer.jpg",
+    "code": "KASM001",
+    "stock": 25,
+    "status": true,
+    "category": "Electrodomésticos"
+  },
+  {
+    "id": 14,
+    "title": "Ray-Ban Aviator Sunglasses",
+    "description": "Gafas de sol estilo aviador",
+    "price": 149.99,
+    "thumbnail": "rayban_aviator.jpg",
+    "code": "RBAS001",
+    "stock": 30,
+    "status": true,
+    "category": "Moda"
+  },
+  {
+    "id": 15,
+    "title": "FitDesk Under Desk Elliptical",
+    "description": "Máquina elíptica para usar debajo del escritorio",
+    "price": 129.99,
+    "thumbnail": "fitdesk_elliptical.jpg",
+    "code": "FDUE001",
+    "stock": 20,
+    "status": true,
+    "category": "Equipos de Ejercicio"
+  },
+  {
+    "id": 16,
+    "title": "Kindle Oasis E-reader",
+    "description": "Lector electrónico resistente al agua",
+    "price": 249.99,
+    "thumbnail": "kindle_oasis.jpg",
+    "code": "KOE001",
+    "stock": 15,
+    "status": true,
+    "category": "Libros Electrónicos"
+  },
+  {
+    "id": 17,
+    "title": "De'Longhi Espresso Machine",
+    "description": "Máquina de café espresso automática",
+    "price": 599.99,
+    "thumbnail": "delonghi_espresso_machine.jpg",
+    "code": "DEM001",
+    "stock": 12,
+    "status": true,
+    "category": "Cafetería"
+  },
+  {
+    "id": 18,
+    "title": "DJI Mavic Air 2 Drone",
+    "description": "Dron plegable con cámara de alta resolución",
+    "price": 799.99,
+    "thumbnail": "dji_mavic_air2.jpg",
+    "code": "DJIMA2",
+    "stock": 18,
+    "status": true,
+    "category": "Tecnología de Drones"
+  },
+  {
+    "id": 19,
+    "title": "Samsonite Winfield 3 DLX Hardside Luggage",
+    "description": "Equipaje rígido con diseño moderno",
+    "price": 159.99,
+    "thumbnail": "samsonite_luggage.jpg",
+    "code": "SW3DLX001",
+    "stock": 25,
+    "status": true,
+    "category": "Equipaje y Viajes"
+  },
+  {
+    "id": 20,
+    "title": "Lifeproof FRE Series Waterproof Case for iPhone",
+    "description": "Funda impermeable para iPhone",
+    "price": 49.99,
+    "thumbnail": "lifeproof_iphone_case.jpg",
+    "code": "LPIFC001",
+    "stock": 30,
+    "status": true,
+    "category": "Accesorios para Teléfonos"
   }
 ]
