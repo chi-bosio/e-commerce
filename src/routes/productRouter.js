@@ -115,7 +115,7 @@ router.delete('/:pid', async (req, res) => {
             });
         }
 
-        let products = await pm.getProducts(); // Asegúrate de utilizar await para obtener los productos de manera asíncrona
+        let products = await pm.getProducts();
         let indexProduct = products.findIndex(u => u.id === pid);
 
         if (indexProduct === -1) {
