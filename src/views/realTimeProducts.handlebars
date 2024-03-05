@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Time Products</title>
+</head>
+<body>
+    <h1>Listado de Productos en Tiempo Real</h1>
+    <ul id="productList">
+        {{#each products}}
+            <li>Title: {{this.title}}, Description: {{this.description}}, Price: {{this.price}}</li>
+        {{/each}}
+    </ul>
+    <form id="productForm" method="POST" action="/api/products">
+        <input type="text" id="productName" name="productName" placeholder="Nombre del Producto">
+        <button type="submit">Agregar Producto</button>
+    </form>
+    <form id="deleteForm" method="DELETE" action="/api/products">
+        <input type="text" id="productId" name="productId" placeholder="ID del Producto a Eliminar">
+        <button type="submit">Eliminar Producto</button>
+    </form>
+    
+    <script type="module" src="/scripts/realTimeProducts.js"></script>
+</body>
+</html>
