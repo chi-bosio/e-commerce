@@ -6,7 +6,7 @@ const engine = require('express-handlebars').engine
 const productRouter = require('./routes/productRouter.js')
 const cartRouter = require('./routes/cartRouter.js')
 const handlebarsRouter = require('./routes/handlebarsRouter.js')
-const socketioRouter = require('./routes/socketIO.js')
+const socketioRouter = require('./routes/socketioRouter.js')
 
 const PORT = 8080
 const app = express()
