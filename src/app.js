@@ -2,6 +2,7 @@ const express=require('express');
 const http = require('http')
 const {Server}= require("socket.io")
 const engine = require('express-handlebars').engine
+const path = require('path')
 
 const productRouter = require('./routes/productRouter.js')
 const cartRouter = require('./routes/cartRouter.js')
@@ -15,6 +16,7 @@ const io = new Server(server)
 
 app.engine('handlebars', engine());
 app.set('view engine', 'handlebars');
+app.set('views', path.join(__dirname, 'views'))
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
