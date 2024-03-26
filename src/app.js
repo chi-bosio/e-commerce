@@ -4,6 +4,7 @@ const {Server}= require('socket.io')
 const engine = require('express-handlebars').engine
 const path = require('path')
 const mongoose = require('mongoose')
+const messageModel = require("./dao/models/messagesModel.js")
 
 const productRouter = require('./routes/productRouter.js')
 const cartRouter = require('./routes/cartRouter.js')
