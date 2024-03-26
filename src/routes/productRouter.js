@@ -1,4 +1,4 @@
-const ProductManager = require('../managers/productManager.js')
+const ProductManager = require('../dao/productManager.js')
 const path = require('path')
 
 const Router=require('express').Router;

@@ -1,8 +1,9 @@
 const express=require('express');
 const http = require('http')
-const {Server}= require("socket.io")
+const {Server}= require('socket.io')
 const engine = require('express-handlebars').engine
 const path = require('path')
+const mongoose = require('mongoose')
 
 const productRouter = require('./routes/productRouter.js')
 const cartRouter = require('./routes/cartRouter.js')
@@ -37,3 +38,13 @@ app.get('*', (req, res) => {
 server.listen(PORT, () => {
     console.log(`Server Online en puerto ${PORT}`);
 });
+
+const connect = async () => {
+    try{
+        await mongoose.connect("mongodb+srv://chibosio:Mika&Silver@cluster0.3jin0k1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&dbName=ecommerce")
+        console.log("DB online...!!");
+    } catch(error){
+        console.log("Conexión fallida. Detalle:", error.message);
+    }
+} 
+connect()
