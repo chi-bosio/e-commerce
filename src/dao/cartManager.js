@@ -28,17 +28,11 @@ class CartManager {
         try {
             let carts = await this.getCarts();
     
-            const cart = carts.find(c => c.id === id);
-    
-            if (!cart) {
-                return null; // No se encontró el carrito
+            if (!Array.isArray(carts)) {
+                throw new Error('getCarts() no devolvió un array');
             }
     
-            // Aquí es donde se realizará el "populate" de los productos
-            const populatedProducts = await this.populateProducts(cart.products);
-    
-            // Reemplaza los IDs de productos con los detalles completos de productos poblados
-            cart.products = populatedProducts;
+            const cart = carts.find(c => c.id === id);
     
             return cart;
         } catch (error) {
@@ -46,18 +40,6 @@ class CartManager {
         }
     }
     
-    async populateProducts(pid) {
-        const products = [
-            { id: 1, name: 'Product 1', price: 10 },
-            { id: 2, name: 'Product 2', price: 20 },
-            { id: 3, name: 'Product 3', price: 30 }
-        ];
-    
-        const populatedProducts = products.filter(p => pid.includes(p.id));
-    
-        return populatedProducts;
-    }
-
     async addProductToCart(cartId, productId, quantity) {
         try {
             let carts = await this.getCarts();
