@@ -1,4 +1,5 @@
 const ProductManager = require('../dao/productManager.js')
+const productModel = require('../dao/models/productModel.js')
 const path = require('path')
 
 const Router=require('express').Router;
@@ -9,18 +10,54 @@ const pm = new ProductManager(route)
 
 router.get('/', async (req, res) => {
     try {
-        let limit = req.query.limit;
-        let result = await pm.getProducts(); 
-        if (limit && limit > 0) {
-            result = result.slice(0, limit);
+        let { limit = 10, page = 1, sort, query } = req.query;
+        limit = parseInt(limit);
+        page = parseInt(page);
+
+        let filter = {};
+        if (query) {
+            filter = { category: query }; 
+        }
+        let sortOption = {};
+        if (sort === 'asc' || sort === 'desc') {
+            sortOption = { price: sort === 'asc' ? 1 : -1 }; 
         }
 
-        res.setHeader('Content-Type','application/json');
-        return res.status(200).json(result);
+        const count = await productModel.countDocuments(filter);
+        const totalPages = Math.ceil(count / limit);
+        const skip = (page - 1) * limit;
+
+        const products = await productModel.find(filter)
+            .sort(sortOption)
+            .skip(skip)
+            .limit(limit);
+
+        const nextPage = page < totalPages ? page + 1 : null;
+        const prevPage = page > 1 ? page - 1 : null;
+        const hasNextPage = nextPage !== null;
+        const hasPrevPage = prevPage !== null;
+        const prevLink = hasPrevPage ? `/api/products?limit=${limit}&page=${prevPage}&sort=${sort}&query=${query}` : null;
+        const nextLink = hasNextPage ? `/api/products?limit=${limit}&page=${nextPage}&sort=${sort}&query=${query}` : null;
+
+        res.json({
+            status: 'success',
+            payload: products,
+            totalPages,
+            prevPage,
+            nextPage,
+            page,
+            hasPrevPage,
+            hasNextPage,
+            prevLink,
+            nextLink
+        })
     } catch (error) {
-        res.status(500).json({
-            error: 'Error al obtener los productos' 
-        });
+        console.error(error);
+        res.status(500).json(
+            { 
+                status: 'error', message: 'ERROR INTERNO' 
+            }
+        );
     }
 });
 

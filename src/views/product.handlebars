@@ -1,0 +1,70 @@
+<h2>Productos:</h2>
+<hr>
+<ul>
+    {{#each products}}
+
+        <li>
+            Producto: {{title}} - Precio: {{price}} - Code: {{code}}
+        </li>
+
+    {{/each}}
+</ul>
+{{!-- 
+<a href="/product?pagina=1">Pag.1</a>
+
+{{#if hasPrevPage}}
+    <a href="/product?pagina={{prevPage}}">Pag.Ant.</a>
+{{/if}}
+
+{{#if hasNextPage}}
+    <a href="/product?pagina={{nextPage}}">Pag.Sig.</a>
+{{/if}}
+
+<a href="/product?pagina={{totalPages}}">Ult. Pag.</a>
+
+<input type="text" id="pagina">
+
+<script>
+    let inputPagina=document.getElementById("pagina")
+
+    inputPagina.addEventListener("change", e=>{
+        e.preventDefault()
+        //alert("cambio")
+        window.location.href="/usuarios?pagina="+inputPagina.value
+    })
+
+</script> --}}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos</title>
+</head>
+<body>
+    <h1>Productos</h1>
+    <ul>
+        {{#each products}}
+            <li>
+                <span>{{this.name}}</span>
+                <span>{{this.price}}</span>
+                <span>{{this.category}}</span>
+                <button onclick="addToCart('{{this._id}}')">Agregar al carrito</button>
+            </li>
+        {{/each}}
+    </ul>
+    
+    {{#if prevLink}}
+        <a href="{{prevLink}}">Página anterior</a>
+    {{/if}}
+    {{#if nextLink}}
+        <a href="{{nextLink}}">Página siguiente</a>
+    {{/if}}
+
+    <script>
+        function addToCart(productId) {
+            // Lógica para agregar el producto al carrito
+            alert('Producto agregado al carrito');
+        }
+    </script>
+</body>
+</html>

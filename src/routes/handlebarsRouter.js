@@ -5,7 +5,7 @@ const path = require('path');
 const Router = express.Router;
 const router = Router();
 
-const HandlebarsManager = require('../managers/handlebarsManager.js');
+const HandlebarsManager = require('../dao/handlebarsManager.js');
 const hm = new HandlebarsManager()
 
 
