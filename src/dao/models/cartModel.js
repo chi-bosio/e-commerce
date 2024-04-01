@@ -1,20 +1,22 @@
 const mongoose = require('mongoose')
-const paginate = require('mongoose-paginate-v2')
 
-const cartSchema = new Schema(
+const cartSchema = new mongoose.Schema(
     {
-        products: [
-            {
-                type: Schema.Types.ObjectId,
-                ref: 'Product'
-            }
-        ]
+        products: {
+            type: [
+                {
+                    product: {
+                        type: mongoose.Schema.Types.ObjectId,
+                        ref: 'products'
+                    },
+                    quantity: Number
+                }
+            ]
+        }
     },{
         timestamps: true
     }
 )
 
-productSchema.plugin(paginate)
-
-const productModel = mongoose.model('carts', cartSchema)
-module.exports = productModel
+const cartModel = mongoose.model('carts', cartSchema)
+module.exports = cartModel
