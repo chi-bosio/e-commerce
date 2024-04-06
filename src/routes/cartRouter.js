@@ -11,8 +11,14 @@ const cm = new CartManagerMONGO();
 
 router.post('/', async (req, res) => {
     try {
-        const newCart = await cm.createCart();
-        res.status(201).json(newCart);
+        await cm.createCart();
+
+        res.json(
+            {
+                status: 'success',
+                message: "Carrito creado con éxito"
+            }
+        )
     } catch (error) {
         throw new Error('Error al crear un nuevo carrito: ' + error.message);
     }
@@ -42,9 +48,14 @@ router.post('/:cid/product/:pid', async (req, res) => {
     try {
         const { cid, pid } = req.params;
 
-        const result = await cm.addProductToCart(cid, pid);
+        await cm.addProductToCart(cid, pid);
 
-        res.status(201).json(result);
+        res.json(
+            {
+                status: 'success',
+                message: "Producto agregado con éxito"
+            }
+        )
     } catch (error) {
         throw new Error('Error al agregar el producto al carrito: ' + error.message);
     }
@@ -68,64 +79,22 @@ router.delete('/:cid/product/:pid', async (req, res) => {
     }
 })
 
-// router.put('/:cid', async (req, res) => {
-//     try {
-//         const { cid } = req.params;
-//         const newProducts = req.body.products;
+router.put('/:cid/product/:pid', async (req, res) => {
+    const { cid, pid } = req.params;
+    const { quantity } = req.body;
 
-//         const cart = await cm.getCartById(cid);
-//         if (!cart) {
-//             return res.status(404).json({ error: 'El carrito especificado no existe' });
-//         }
-
-//         cart.products = newProducts;
-
-//         await cm.updateCart(cart);
-
-//         return res.json({
-//             status: 'success',
-//             message: 'Carrito actualizado correctamente',
-//             cart: cart
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ status: 'error', message: 'Error interno' });
-//     }
-// })
-
-// router.put('/:cid/products/:pid', async (req, res) => {
-//     try {
-//         const { cid, pid } = req.params;
-//         const { quantity } = req.body;
-
-//         if (!Number.isInteger(quantity) || quantity <= 0) {
-//             return res.status(400).json({ error: 'La cantidad debe ser un número entero positivo' });
-//         }
-
-//         const cart = await cm.getCartById(cid);
-//         if (!cart) {
-//             return res.status(404).json({ error: 'El carrito especificado no existe' });
-//         }
-
-//         const productIndex = cart.products.findIndex(product => product.product === pid);
-//         if (productIndex === -1) {
-//             return res.status(404).json({ error: 'El producto especificado no está en el carrito' });
-//         }
-
-//         cart.products[productIndex].quantity = quantity;
-
-//         await fs.promises.writeFile(route, JSON.stringify(cart, null, 2));
-
-//         return res.json({
-//             status: 'success',
-//             message: 'Cantidad de ejemplares del producto actualizada correctamente',
-//             cart: cart
-//         });
-//     } catch (error) {
-//         console.error(error);
-//         return res.status(500).json({ status: 'error', message: 'Error interno' });
-//     }
-// })
+    try {
+        await cm.updateQuantityProduct(cid, pid, quantity)
+        res.json(
+            {
+                status: 'success',
+                message: "La cantidad del producto fue actualizada con éxito"
+            }
+        )
+    } catch (error) {
+        throw new Error('Error al actualizar la cantidad del producto del carrito: ' + error.message);
+    }
+})
 
 // router.delete('/:cid', async (req, res) => {
 //     try {
