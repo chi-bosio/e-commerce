@@ -66,31 +66,25 @@ class CartManagerMONGO {
 //         }
 //     }
 
-//     async removeProductFromCart(cartId, productId) {
-//         try {
-//             let carts = await this.getCarts();
-    
-//             const cart = carts.find(c => c.id === cartId);
-    
-//             if (!cart) {
-//                 return { success: false, error: 'Carrito no encontrado' };
-//             }
-    
-//             const initialProductsLength = cart.products.length;
-    
-//             cart.products = cart.products.filter(product => product.product !== productId);
-    
-//             if (cart.products.length < initialProductsLength) {
-//                 await fs.promises.writeFile(this.path, JSON.stringify(carts, null, 2));
-    
-//                 return { success: true };
-//             } else {
-//                 return { success: false, error: 'El producto no está en el carrito' };
-//             }
-//         } catch (error) {
-//             throw error;
-//         }
-//     }
+    async removeProductFromCart(cid, pid) {
+        try {
+            let carts = await cartModel.findById(cid);
+
+            if (!carts) {
+                throw new Error('Carrito no encontrado')
+            }
+
+            carts.products = carts.products.filter(
+                p => !p.product.equals(pid)
+            )
+
+            await carts.save()
+
+            return carts
+        } catch (error) {
+            throw new Error("Error al eliminar el producto en el carrito: " + error.message);
+        }
+    }
 
 //     async updateCart(cartId, newProducts) {
 //         try {

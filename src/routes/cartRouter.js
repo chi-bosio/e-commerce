@@ -14,9 +14,7 @@ router.post('/', async (req, res) => {
         const newCart = await cm.createCart();
         res.status(201).json(newCart);
     } catch (error) {
-        res.status(500).json({
-            error: 'Error al crear un nuevo carrito'
-        });
+        throw new Error('Error al crear un nuevo carrito: ' + error.message);
     }
 });
 
@@ -36,13 +34,7 @@ router.get('/:cid', async (req, res) => {
         res.setHeader('Content-Type','application/json');
         return res.status(200).json({cart});
     } catch (error) {
-        res.setHeader('Content-Type','application/json');
-        return res.status(500).json(
-            {
-                error:`Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`,
-                detalle:`${error.message}`
-            }
-        )
+        throw new Error('Error al encontrar el carrito: ' + error.message);
     }
 });
 
@@ -54,34 +46,27 @@ router.post('/:cid/product/:pid', async (req, res) => {
 
         res.status(201).json(result);
     } catch (error) {
-        res.status(500).json({
-            error: 'Error al agregar el producto al carrito'
-        });
+        throw new Error('Error al agregar el producto al carrito: ' + error.message);
     }
 });
 
-// router.delete('/:cid/products/:pid', async (req, res) => {
-//     try {
-//         const { cid, pid } = req.params;
+router.delete('/:cid/product/:pid', async (req, res) => {
+    
+    const { cid, pid } = req.params;
 
-//         const result = await cm.removeProductFromCart(cid, pid);
+    try {
+        
+        await cm.removeProductFromCart(cid, pid);
+        
+        return res.json({
+            status: 'success',
+            message: 'Producto removido del carrito'
+        });
 
-//         if (result.success) {
-//             return res.json({
-//                 status: 'success',
-//                 message: 'Producto removido del carrito'
-//             });
-//         } else {
-//             return res.status(404).json({
-//                 status: 'error',
-//                 message: result.error || 'El carrito especificado no existe o el producto no está en el carrito'
-//             });
-//         }
-//     } catch (error) {
-//         console.error(error);
-//         res.status(500).json({ status: 'error', message: 'Error interno' });
-//     }
-// })
+    } catch (error) {
+        throw new Error('Error al eliminar el producto del carrito: ' + error.message);
+    }
+})
 
 // router.put('/:cid', async (req, res) => {
 //     try {
