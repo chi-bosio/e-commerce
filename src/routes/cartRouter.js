@@ -46,26 +46,19 @@ router.get('/:cid', async (req, res) => {
     }
 });
 
-// router.post('/:cid/product/:pid', async (req, res) => {
-//     try {
-//         const { cid, pid } = req.params;
-//         const quantity = 1;
+router.post('/:cid/product/:pid', async (req, res) => {
+    try {
+        const { cid, pid } = req.params;
 
-//         const result = await cm.addProductToCart(cid, pid, quantity);
+        const result = await cm.addProductToCart(cid, pid);
 
-//         if (result.error) {
-//             return res.status(400).json({
-//                 error: result.error
-//             });
-//         }
-
-//         res.status(201).json(result.cart);
-//     } catch (error) {
-//         res.status(500).json({
-//             error: 'Error al agregar el producto al carrito'
-//         });
-//     }
-// });
+        res.status(201).json(result);
+    } catch (error) {
+        res.status(500).json({
+            error: 'Error al agregar el producto al carrito'
+        });
+    }
+});
 
 // router.delete('/:cid/products/:pid', async (req, res) => {
 //     try {

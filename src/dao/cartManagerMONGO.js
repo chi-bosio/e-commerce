@@ -7,11 +7,11 @@ class CartManagerMONGO {
     async createCart() {
         try {
 
-            let newCart=await cartModel.create({products:[]})
+            let newCart=await cartModel.create({products: []})
 
             return newCart;
         } catch (error) {
-            throw error;
+            throw new Error("Error al crear el carrito: " + error.message);
         }
     }
 
@@ -26,39 +26,37 @@ class CartManagerMONGO {
     
             return cart;
         } catch (error) {
-            throw error;
+            throw new Error("Error al obtener el carrito: " + error.message);
         }
     }
     
 
-//     async addProductToCart(cartId, productId, quantity) {
-//         try {
-//             let carts = await this.getCarts();
+    async addProductToCart(cid, pid) {
+        
+        try {
+            let carts = await cartModel.findById(cid);
 
-//             const cart = carts.find(c => c.id === cartId);
+            if (!carts) {
+                return { error: 'Carrito no encontrado' };
+            }
 
-//             if (!cart) {
-//                 return { error: 'Carrito no encontrado' };
-//             }
+            const existingProduct = carts.products.find(p => p.product === pid);
+            
+            if (existingProduct) {
+                existingProduct.quantity++;
+            } else {
+                carts.products.push({
+                    product: pid,
+                    quantity: 1
+                });
+            }
+            await carts.save()
 
-//             const existingProduct = cart.products.find(p => p.product === productId);
-
-//             if (existingProduct) {
-//                 existingProduct.quantity += quantity;
-//             } else {
-//                 cart.products.push({
-//                     product: productId,
-//                     quantity
-//                 });
-//             }
-
-//             await fs.promises.writeFile(this.path, JSON.stringify(carts, null, 2));
-
-//             return { cart };
-//         } catch (error) {
-//             throw error;
-//         }
-//     }
+            return carts.products.find(p => p.product === pid)
+        } catch (error) {
+            throw new Error("Error al crear el producto en el carrito: " + error.message);
+        }
+    }
 
 //     async getCarts() {
 //         if (fs.existsSync(this.path)) {
