@@ -74,6 +74,12 @@ class CartManagerMONGO {
                 throw new Error('Carrito no encontrado')
             }
 
+            const exist = carts.products.find(p => p.product.equals(pid))
+
+            if(!exist){
+                throw new Error('El producto no existe en el carrito')
+            }
+
             carts.products = carts.products.filter(
                 p => !p.product.equals(pid)
             )
