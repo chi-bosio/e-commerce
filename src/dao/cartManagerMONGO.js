@@ -3,7 +3,6 @@ const productModel= require("./models/productModel")
 
 class CartManagerMONGO {
 
-
     async createCart() {
         try {
 
@@ -30,7 +29,6 @@ class CartManagerMONGO {
         }
     }
     
-
     async addProductToCart(cid, pid) {
         
         try {
@@ -57,14 +55,6 @@ class CartManagerMONGO {
             throw new Error("Error al crear el producto en el carrito: " + error.message);
         }
     }
-
-//     async getCarts() {
-//         if (fs.existsSync(this.path)) {
-//             return JSON.parse(await fs.promises.readFile(this.path, { encoding: 'utf-8' }));
-//         } else {
-//             return [];
-//         }
-//     }
 
     async removeProductFromCart(cid, pid) {
         try {
@@ -116,6 +106,24 @@ class CartManagerMONGO {
         } catch (error) {
             throw new Error("Error al actualizar la cantidad del producto en el carrito: " + error.message);
         }
+    }
+
+    async removeAllProducts(cid){
+        try {
+            let carts = await cartModel.findById(cid);
+
+            if (!carts) {
+                throw new Error('Carrito no encontrado')
+            }
+
+            carts.products = []
+
+            await carts.save()
+
+            return carts
+        } catch (error) {
+            throw new Error("Error al eliminar todos los productos del carrito: " + error.message);
+        } 
     }
 }
 
