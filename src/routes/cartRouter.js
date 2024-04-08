@@ -40,7 +40,7 @@ router.get('/:cid', async (req, res) => {
         res.setHeader('Content-Type','application/json');
         return res.status(200).json({cart});
     } catch (error) {
-        throw new Error('Error al encontrar el carrito: ' + error.message);
+        res.status(404).json({ error: error.message });
     }
 });
 
@@ -57,7 +57,7 @@ router.post('/:cid/product/:pid', async (req, res) => {
             }
         )
     } catch (error) {
-        throw new Error('Error al agregar el producto al carrito: ' + error.message);
+        res.status(404).json({ error: error.message });
     }
 });
 
@@ -75,7 +75,7 @@ router.delete('/:cid/product/:pid', async (req, res) => {
         });
 
     } catch (error) {
-        throw new Error('Error al eliminar el producto del carrito: ' + error.message);
+        res.status(404).json({ error: error.message });
     }
 })
 
@@ -92,7 +92,7 @@ router.put('/:cid/product/:pid', async (req, res) => {
             }
         )
     } catch (error) {
-        throw new Error('Error al actualizar la cantidad del producto del carrito: ' + error.message);
+        res.status(404).json({ error: error.message });
     }
 })
 
@@ -109,7 +109,7 @@ router.delete('/:cid', async (req, res) => {
         });
 
     } catch (error) {
-        throw new Error('Error al eliminar el producto del carrito: ' + error.message);
+        res.status(404).json({ error: error.message });
     }
 });
 

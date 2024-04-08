@@ -14,13 +14,23 @@ class ProductManagerMONGO{
         }
     }
 
-    async getProducts(){
-        return await productModel.paginate({},{lean:true})
+    async getProducts(limit = 5){
+        try {
+            const products = await productModel.find().limit(limit)
+            return products
+        } catch (error) {
+            throw new Error("Error al obtener los productos: " + error.message);
+        }
+        
     }
 
     async getProductById(id){
-
-        return productModel.findOne({_id:id})
+        try {
+            const product = await productModel.findById({_id: id})
+            return product
+        } catch (error) {
+            throw new Error("Error al obtener el producto: " + error.message);
+        }
     }
 
     // async updateProduct(id, updatedFields) {

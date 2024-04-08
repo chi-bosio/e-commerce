@@ -18,40 +18,27 @@ router.get('/',async(req,res)=>{
             limit: parseInt(limit),
             sort: { price: sort === "asc" ? 1 : -1 },
         };
-        
+
         const products = await productModel.paginate({}, options);
         const jsonProducts = JSON.stringify(products, null, 2); 
         
         res.setHeader("Content-Type", "application/json");
         res.send(jsonProducts);
     } catch (error) {
-        res.status(500).json({ error: error.message });
+        res.status(404).json({ error: error.message });
     }
     
 });
 
-// router.get('/:pid', async (req, res) => {
-//     let { pid } = req.params;
-//     pid = Number(pid);
-
-//     if (isNaN(pid)) {
-//         return res.status(400).json({
-//             error: 'El id debe ser del tipo numérico'
-//         });
-//     }
-
-//     try {
-//         let product = await pm.getProductById(pid);
-
-//         res.setHeader('Content-Type','application/json');
-//         return res.status(200).json(product);
-        
-//     } catch (error) {
-//         res.status(500).json({
-//             error: `Error al obtener el producto con id ${pid}` 
-//         });
-//     }
-// });
+router.get('/:pid', async (req, res) => {
+    const pid = req.params.pid
+    try {
+        let product = await pm.getProductById(pid);
+        res.json(product)
+    } catch (error) {
+        res.status(404).json({ error: error.message });
+    }
+});
 
 // router.post('/', async (req, res) => {
 //     try {
