@@ -40,36 +40,26 @@ router.get('/:pid', async (req, res) => {
     }
 });
 
-// router.post('/', async (req, res) => {
-//     try {
-//         const { title, description, price, thumbnail, code, stock } = req.body;
+router.post('/', async (req, res) => {
+    const { title, description, price, thumbnail, code, stock, category, status } = req.body;
 
-//         if (!title || !description || !price || !code || !stock) {
-//             return res.status(400).json({
-//                 error: 'Todos los campos son obligatorios' 
-//             });
-//         }
+    try {
+        let product = await pm.addProduct(
+            title, 
+            description, 
+            price, 
+            thumbnail, 
+            code, 
+            stock, 
+            category, 
+            status
+        )
 
-//         let products = await pm.getProducts()
-//         let exist = products.find(product => product.code === code)
-//         if(exist){
-//             return res.status(400).json({ 
-//                 error: `El producto con code ${code} ya existe...!!` 
-//             });
-//         }
-
-//         const status = true;
-//         const category = req.body.category || 'Categoría Predeterminada';
-
-//         await pm.addProduct(title, description, price, thumbnail, code, stock, status, category);
-
-//         res.status(201).json({ message: 'Producto creado exitosamente' });
-//     } catch (error) {
-//         res.status(500).json({
-//             error: 'Error al crear un nuevo producto' 
-//         });
-//     }
-// })
+        res.status(201).json(product)
+    } catch (error) {
+        res.status(404).json({ error: error.message });
+    }
+})
 
 // router.put('/:pid', async (req, res) => {
 //     try {

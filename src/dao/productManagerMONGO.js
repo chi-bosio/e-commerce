@@ -3,14 +3,23 @@ const productModel = require("./models/productModel");
 
 class ProductManagerMONGO{
 
-    async addProduct(product){
+    async addProduct(title, description, price, thumbnail, code, stock, category, status){
         try {
-            let newProduct=await productModel.create(product)
+            let newProduct = await productModel.create({
+                title: title, 
+                description: description, 
+                price: price, 
+                thumbnail: thumbnail, 
+                code: code, 
+                stock: stock, 
+                category: category, 
+                status: status
+            })
 
             return newProduct
             
         } catch (error) {
-            throw error;
+            throw new Error("Error al agregar el producto: " + error.message);
         }
     }
 
