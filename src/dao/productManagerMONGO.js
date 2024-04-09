@@ -5,7 +5,7 @@ class ProductManagerMONGO{
 
     async addProduct(title, description, price, thumbnail, code, stock, category, status){
         try {
-            let newProduct = await productModel.create({
+            await productModel.create({
                 title: title, 
                 description: description, 
                 price: price, 
@@ -16,27 +16,18 @@ class ProductManagerMONGO{
                 status: status
             })
 
-            return newProduct
+            return { message: `Producto agregado con éxito!!` };
             
         } catch (error) {
             throw new Error("Error al agregar el producto: " + error.message);
         }
-    }
-
-    async getProducts(limit = 5){
-        try {
-            const products = await productModel.find().limit(limit)
-            return products
-        } catch (error) {
-            throw new Error("Error al obtener los productos: " + error.message);
-        }
-        
-    }
+    } 
 
     async getProductById(id){
         try {
             const product = await productModel.findById({_id: id})
-            return product
+            return { message: `Producto con id ${id} encontrado!!
+                        ${product}` };
         } catch (error) {
             throw new Error("Error al obtener el producto: " + error.message);
         }
@@ -60,22 +51,21 @@ class ProductManagerMONGO{
         }
     }
 
-    // async deleteProduct(id){
-    //     try {
-    //         let products = await this.getProducts();
+    async deleteProduct(id){
+        try {
+            let product = await productModel.findByIdAndDelete({
+                _id: id
+            });
     
-    //         const index = products.findIndex(p => p.id === id);
-    
-    //         if (index !== -1) {
-    
-    //             products.splice(index, 1);
-    
-    //             await fs.promises.writeFile(this.path, JSON.stringify(products, null, 2), 'utf-8');
-    //         }
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
+           if(!product){
+            throw new Error('Producto no encontrado')
+           }
+
+            return { message: `Producto con id ${id} eliminado correctamente.` };
+        } catch (error) {
+            throw new Error("Error al eliminar el producto: " + error.message);
+       }
+    }
 }
 
 module.exports = ProductManagerMONGO

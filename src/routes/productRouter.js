@@ -73,32 +73,14 @@ router.put('/:pid', async (req, res) => {
     }
 });
 
-// router.delete('/:pid', async (req, res) => {
-//     try {
-//         let { pid } = req.params;
-//         pid = Number(pid);
-
-//         if (isNaN(pid)) {
-//             return res.status(400).json({
-//                 error: 'El id debe ser del tipo numérico'
-//             });
-//         }
-
-//         let products = await pm.getProducts();
-//         let indexProduct = products.findIndex(u => u.id === pid);
-
-//         if (indexProduct === -1) {
-//             return res.status(400).json({ error: `No existen productos con id ${pid}` });
-//         }
-
-//         await pm.deleteProduct(pid);
-
-//         res.status(200).json({ message: 'Producto eliminado con éxito' });
-//     } catch (error) {
-//         res.status(500).json({
-//             error: `Error al eliminar el producto con id ${pid}`
-//         });
-//     }
-// });
+router.delete('/:pid', async (req, res) => {
+    let pid = req.params.pid;
+    try {
+        const product = await pm.deleteProduct(pid)
+        res.json(product)
+    } catch (error) {
+        res.status(404).json({ error: error.message });
+    }
+});
 
 module.exports = router
