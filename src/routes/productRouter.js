@@ -61,31 +61,17 @@ router.post('/', async (req, res) => {
     }
 })
 
-// router.put('/:pid', async (req, res) => {
-//     try {
-//         let { pid } = req.params;
-//         const { title, description, price, thumbnail, code, stock, status, category } = req.body;
+router.put('/:pid', async (req, res) => {
+    let pid = req.params.pid;
+    const updatedFields = req.body
 
-//         pid = Number(pid);
-//         if (isNaN(pid)) {
-//             return res.status(400).json({
-//                 error: 'El id debe ser del tipo numérico'
-//             });
-//         }
-        
-//         const result = await pm.updateProduct(pid, { title, description, price, thumbnail, code, stock, status, category });
-
-//         if (result.error) {
-//             return res.status(404).json({ error: result.error });
-//         }
-
-//         res.status(200).json({ message: 'Producto actualizado con éxito' });
-//     } catch (error) {
-//         res.status(500).json({
-//             error: `Error al actualizar el producto con id ${pid}` 
-//         });
-//     }
-// });
+    try {
+        const product = await pm.updateProduct(pid, updatedFields)
+        res.json(product)
+    } catch (error) {
+        res.status(404).json({ error: error.message });
+    }
+});
 
 // router.delete('/:pid', async (req, res) => {
 //     try {

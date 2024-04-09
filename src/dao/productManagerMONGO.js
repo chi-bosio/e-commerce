@@ -42,25 +42,23 @@ class ProductManagerMONGO{
         }
     }
 
-    // async updateProduct(id, updatedFields) {
-    //     try {
-    //         let products = await this.getProducts();
+    async updateProduct(id, updatedFields) {
+        try {
+            let products = await productModel.findOneAndUpdate(
+                {_id: id},
+                updatedFields,
+                {new: true}
+            );
     
-    //         const productIndex = products.findIndex(p => p.id === id);
-    
-    //         if (productIndex === -1) {
-    //             return { error: `No existe producto con id: ${id}` };
-    //         }
-    
-    //         products[productIndex] = { ...products[productIndex], ...updatedFields };
-    
-    //         await fs.promises.writeFile(this.path, JSON.stringify(products, null, 2), 'utf-8');
-    
-    //         return { message: `Producto con id ${id} actualizado correctamente.` };
-    //     } catch (error) {
-    //         throw error;
-    //     }
-    // }
+            if(!products){
+                throw new Error('Producto no encontrado')
+            }
+
+            return { message: `Producto con id ${id} actualizado correctamente.` };
+        } catch (error) {
+             throw new Error("Error al actualizar el producto: " + error.message);
+        }
+    }
 
     // async deleteProduct(id){
     //     try {
