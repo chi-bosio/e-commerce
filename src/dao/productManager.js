@@ -1,7 +1,7 @@
 const productModel = require("./models/productModel");
 
 
-class ProductManagerMONGO{
+class ProductManager{
 
     async addProduct(title, description, price, thumbnail, code, stock, category, status){
         try {
@@ -77,4 +77,4 @@ class ProductManagerMONGO{
     }
 }
 
-module.exports = ProductManagerMONGO
+module.exports = ProductManager

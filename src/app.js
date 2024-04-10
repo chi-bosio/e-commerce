@@ -1,10 +1,9 @@
 const express=require('express');
 const http = require('http')
-const {Server}= require('socket.io')
+const socketIO = require('socket.io')
 const engine = require('express-handlebars').engine
 const path = require('path')
 const mongoose = require('mongoose')
-const socketIO = require("socket.io");
 const session = require('express-session')
 // const messageModel = require("./dao/models/messagesModel.js")
 
@@ -17,7 +16,8 @@ const viewRouter = router
 
 const PORT = 8080
 const app = express()
-const io = socketIO(server);
+const server = http.createServer(app)
+const io = socketIO(server)
 
 app.engine('handlebars', engine({
     runtimeOptions: {
@@ -31,7 +31,7 @@ app.set('views', path.join(__dirname, 'views'))
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use(session({
-    secret: 'secret',
+    secret: "secret",
     resave: true,
     saveUninitialized: true
 }))

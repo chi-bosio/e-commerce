@@ -1,7 +1,7 @@
 const cartModel = require("./models/cartModel");
 const productModel= require("./models/productModel")
 
-class CartManagerMONGO {
+class CartManager{
 
     async createCart() {
         try {
@@ -127,4 +127,4 @@ class CartManagerMONGO {
     }
 }
 
-module.exports = CartManagerMONGO;
+module.exports = CartManager;
