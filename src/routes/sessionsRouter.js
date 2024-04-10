@@ -28,6 +28,16 @@ router.post('/register', async (req, res) => {
         
         res.status(201).json(user)
     } catch (error) {
+        return res.redirect("/register?error=registerError");
+    }
+})
+
+router.get('/', async (req, res) => {
+    try {
+        const user = await um.getUsers()
+        res.json(user)
+    } catch (error) {
+        res.status(500).json({error: error.message})
     }
 })
 
