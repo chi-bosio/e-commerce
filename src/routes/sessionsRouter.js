@@ -41,4 +41,19 @@ router.get('/', async (req, res) => {
     }
 })
 
+router.post('/login', async (req, res) => {
+    const {username, password} = req.body
+    try {
+        if(!username || !password){
+            return res.render('/login?error=missingFields')
+        }
+
+        const user = await um.authenticateUser(username, password)
+        req.session.user = user
+        res.redirect('/products')
+    } catch (error) {
+        return res.redirect("/login?error=invalidCredentials");
+    }
+})
+
 module.exports = router
