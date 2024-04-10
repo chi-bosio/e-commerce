@@ -4,16 +4,20 @@ const {Server}= require('socket.io')
 const engine = require('express-handlebars').engine
 const path = require('path')
 const mongoose = require('mongoose')
-const messageModel = require("./dao/models/messagesModel.js")
+const socketIO = require("socket.io");
+const session = require('express-session')
+// const messageModel = require("./dao/models/messagesModel.js")
 
 const productRouter = require('./routes/productRouter.js')
 const cartRouter = require('./routes/cartRouter.js')
 const {router, handleRealTimeProductsSocket} = require('./routes/viewRouter.js')
+const sessionRouter = require('./routes/sessionsRouter.js')
 
 const viewRouter = router
 
 const PORT = 8080
 const app = express()
+const io = socketIO(server);
 
 app.engine('handlebars', engine({
     runtimeOptions: {
@@ -26,22 +30,26 @@ app.set('views', path.join(__dirname, 'views'))
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
+app.use(session({
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true
+}))
 
 app.use(express.static(path.join(__dirname, 'public')))
 
+app.use('/', viewRouter)
 app.use('/api/products', productRouter)
 app.use('/api/carts', cartRouter)
-app.use('/', viewRouter)
+app.use('/api/sessions', sessionRouter)
 
 app.get('*', (req, res) => {
     res.send('Error 404 - Not Found')
 })
 
-const server = app.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log(`Server Online en puerto ${PORT}`);
 });
-
-const io = new Server(server)
 
 handleRealTimeProductsSocket(io)
 

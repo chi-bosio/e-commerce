@@ -1,14 +1,11 @@
-// const ProductManager = require('../dao/productManager.js')
-// const productModel = require('../dao/models/productModel.js')
 const path = require('path')
-const ProductManagerMONGO = require('../dao/productManagerMONGO');
+const ProductManager = require('../dao/productManager');
 const productModel = require('../dao/models/productModel');
 
 const Router=require('express').Router;
 const router=Router()
 
-// let route = path.join(__dirname,'..', 'data','products.json')
-const pm = new ProductManagerMONGO()
+const pm = new ProductManager()
 
 router.get('/',async(req,res)=>{
     try {

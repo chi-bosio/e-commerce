@@ -1,14 +1,14 @@
 const fs = require('fs');
 const express = require('express');
 const path = require('path');
-const ProductManagerMONGO = require('../dao/productManagerMONGO.js') 
+const ProductManager = require('../dao/productManager.js') 
 const productModel = require('../dao/models/productModel.js')
 const cartModel = require('../dao/models/cartModel.js')
 
 const Router = express.Router;
 const router = Router();
 
-const pm = new ProductManagerMONGO()
+const pm = new ProductManager()
 
 function handleRealTimeProductsSocket(io) {
     io.on("connection", async (socket) => {
