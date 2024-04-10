@@ -56,4 +56,18 @@ router.post('/login', async (req, res) => {
     }
 })
 
+router.get('/logout', async (req, res) => {
+    try {
+        req.session.destroy(error => {
+            if(error){
+                res.status(500).send({ error: 'Error al cerrar sesión', error });
+            } else{
+                res.redirect('/api/sessions/login')
+            }
+        })
+    } catch (error) {
+        res.status(500).json({error: error.message})
+    }
+})
+
 module.exports = router
