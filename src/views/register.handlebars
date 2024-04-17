@@ -1,21 +1,21 @@
 <h2>Registro</h2>
 <hr>
-<form action="/api/sessions/registro" method="post">
 
-    {{#if error}}
-        <div style="font-weight: bold; color:red;">{{error}}</div>
-    {{/if}}
+<div id="mensaje">
+        {{#if error}}
+        <div style="font-weight: bold; color: red">{{error}}</div>
+        {{/if}}
+    </div>
 
-    {{#if mensaje}}
-        <div style="font-weight: bold; color:green;">{{mensaje}}</div>
-    {{/if}}
+<form action="/api/sessions/register" method="post">
 
-    <input type="text" name="first_name" placeholder="first_name">
-    <input type="text" name="last_name" placeholder="last_name">
-    <input type="number" name="age" placeholder="age">
+    <input type="text" name="username" placeholder="name">
     <input type="email" name="email" placeholder="email">
     <input type="password" name="password" placeholder="contraseña">
+    <input type="hidden" name="role" value="user">
     <br>
     <input type="submit" value="Registrar">
 
 </form>
+
+<a href="/">Volver a Inicio</a>

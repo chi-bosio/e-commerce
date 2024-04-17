@@ -1,16 +1,23 @@
 <h2>Login</h2>
 <hr>
+<div id="mensaje">
+        {{#if error}}
+        <div style="font-weight: bold; color: red">{{error}}</div>
+        {{/if}}
+    </div>
+    
 <form action="/api/sessions/login" method="post">
-
-    <div id="mensaje"></div>
 
     <input type="email" name="email" placeholder="email" id="email">
     <input type="password" name="password" placeholder="password" id="password">
     <br>
-    <input type="submit" value="Ingresar" id="submit">
+    <input type="submit" class="btn-form" value="Ingresar" id="submit">
 
 </form>
 
-
+<br>
+<a href="/api/sessions/github">Ingresar con github</a>
 
 <script src="/public/scripts/login.js"></script>
+
+<a href="/">Volver a Inicio</a>
