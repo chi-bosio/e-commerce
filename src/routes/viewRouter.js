@@ -1,14 +1,13 @@
-const fs = require('fs');
-const express = require('express');
-const path = require('path');
-const ProductManager = require('../dao/productManager.js') 
+const Router = require('express').Router;
+const socketIo = require('socket.io')
+const ProductManager = require('../dao/productManager.js')
+const UserManager = require('../dao/userManager.js') 
 const productModel = require('../dao/models/productModel.js')
 const cartModel = require('../dao/models/cartModel.js')
 
-const Router = express.Router;
 const router = Router();
-
 const pm = new ProductManager()
+const um = new UserManager()
 
 function handleRealTimeProductsSocket(io) {
     io.on("connection", async (socket) => {
@@ -19,7 +18,7 @@ function handleRealTimeProductsSocket(io) {
 }  
 
 router.get("/", async (req, res) => {
-    res.status(200).render("home");
+    res.status(200).render('home');
 });
 
 router.get("/products", async (req, res) => {
@@ -40,6 +39,20 @@ router.get("/products", async (req, res) => {
         { limit: 10, page: page, lean: true }
     );
 
+    let messageWelcome = ''
+    if(req.session.user){
+        try {
+            const user = await um.getUserByFilter({username: req.session.user.username})
+            if(user.role === 'admin'){
+                messageWelcome = `Bienvenido administrador ${user.username}!!`
+            } else{
+                messageWelcome = `Bienvenido usuario ${user.username}!!`
+            }
+        } catch (error) {
+            console.error(error);
+            res.status(500).send("Error al obtener la info del usuario.");
+        }
+    }
     res.status(200).render("product", {
         product,
         totalPages,
@@ -47,6 +60,7 @@ router.get("/products", async (req, res) => {
         nextPage,
         hasPrevPage,
         hasNextPage,
+        messageWelcome
     });
 });
 
@@ -98,6 +112,23 @@ router.get("/cart/:cid", async (req, res) => {
         res.status(500).send("Error al procesar la solicitud.");
     }
 });
+
+router.get('/login', async (req, res) => {
+    const {message, error} = req.query
+    res.status(200).render('login', {message, error})
+})
+
+router.get('/register', async (req, res) => {
+    const {message, error} = req.query
+    res.status(200).render('register', {message, error})
+})
+
+router.get('/profile', async (req, res) => {
+    if(!req.session.user){
+        return res.redirect('/login')
+    }
+    res.render('profile', {user: req.session.user})
+})
 
 router.get("/realtimeproducts", async (req, res) => {
     const products = await pm.getProduct();
