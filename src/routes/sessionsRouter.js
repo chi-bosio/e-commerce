@@ -28,19 +28,20 @@ router.post('/register', passport.authenticate('register', {
     }
 )
 
-router.post('/login', async (req, res) => {
-    const {username, password} = req.body
-    try {
-        if(!username || !password){
-            return res.render('/login?error=missingFields')
-        }
+router.get('/loginError', async (req, res) => {
+    res.redirect('/login?error=Error en login')
+})
 
-        const user = await um.authenticateUser(username, password)
+router.post('/login', passport.authenticate('login', {
+        failureRedirect: '/api/sessions/loginError'
+    }),
+    async (req, res) => {
+        const user = req.user
+        user = {...user}
+        delete user.password
         req.session.user = user
-        res.redirect('/products')
-    } catch (error) {
-        return res.redirect("/login?error=invalidCredentials");
-    }
+        req.setHeader('Content-Type', 'application/json')
+        return res.redirect('/api/products')
 })
 
 router.get('/logout', async (req, res) => {
