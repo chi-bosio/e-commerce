@@ -1,4 +1,5 @@
 const userModel = require('./models/usersModel')
+const bcrypt = require('bcrypt')
 
 class UserManager{
 
@@ -8,10 +9,11 @@ class UserManager{
     
     async addUser(username, email, password, role){
         try {
+            const hashedPassword = await bcrypt.hash(password, 8)
             const user = await userModel.create({
                 username: username,
                 email: email,
-                password: password,
+                password: hashedPassword,
                 role: role
             })
             return user
@@ -37,7 +39,8 @@ class UserManager{
                 throw new Error('Usuario no encontrado')
             }
 
-            if(user.password !== password){
+            const passwordCorrect = await bcrypt.compare(password, user.password)
+            if(!passwordCorrect){
                 throw new Error('Contraseña incorrecta')
             }
 

@@ -2,35 +2,10 @@ const UserManager = require('../dao/userManager')
 const userModel = require('../dao/models/usersModel')
 
 const Router = require('express').Router
+const passport = require('passport')
+
 const router = Router()
-
 const um = new UserManager()
-
-router.post('/register', async (req, res) => {
-    const {
-        username,
-        email,
-        password,
-        role
-    } = req.body
-
-    try {
-        if(!username || !email || !password || !role){
-            res.status(400).json({ error: 'Completar todos los campos' });
-        }
-
-        if(await um.getUserByFilter({email})){
-            res.status(400).json({ error: 'Email existente!!' });
-        }
-
-        const user = await um.addUser(username, email, password, role)
-        req.session.user = user
-        
-        res.status(201).json(user)
-    } catch (error) {
-        return res.redirect("/register?error=registerError");
-    }
-})
 
 router.get('/', async (req, res) => {
     try {
@@ -40,6 +15,18 @@ router.get('/', async (req, res) => {
         res.status(500).json({error: error.message})
     }
 })
+
+router.get('/registerError', async (req, res) => {
+    res.redirect('/register?message=Error en registro')
+})
+
+router.post('/register', passport.authenticate('register', {
+        failureRedirect: '/api/sessions/registerError'
+    }),
+    async (req, res) => {
+        return res.redirect('/register?message=Registro correcto!!')
+    }
+)
 
 router.post('/login', async (req, res) => {
     const {username, password} = req.body
