@@ -5,7 +5,9 @@ const engine = require('express-handlebars').engine
 const path = require('path')
 const mongoose = require('mongoose')
 const session = require('express-session')
-// const messageModel = require("./dao/models/messagesModel.js")
+const passport = require('passport')
+
+const passportConfig = require('./config/passportConfig.js')
 
 const productRouter = require('./routes/productRouter.js')
 const cartRouter = require('./routes/cartRouter.js')
@@ -19,6 +21,18 @@ const app = express()
 const server = http.createServer(app)
 const io = socketIO(server)
 
+app.use(express.json());
+app.use(express.urlencoded({extended:true}));
+app.use(session({
+    secret: "secret",
+    resave: true,
+    saveUninitialized: true
+}))
+
+passportConfig()
+app.use(passport.initialize())
+app.use(passport.session())
+
 app.engine('handlebars', engine({
     runtimeOptions: {
         allowProtoPropertiesByDefault: true,
@@ -27,14 +41,6 @@ app.engine('handlebars', engine({
 }));
 app.set('view engine', 'handlebars');
 app.set('views', path.join(__dirname, 'views'))
-
-app.use(express.json());
-app.use(express.urlencoded({extended:true}));
-app.use(session({
-    secret: "secret",
-    resave: true,
-    saveUninitialized: true
-}))
 
 app.use(express.static(path.join(__dirname, 'public')))
 
