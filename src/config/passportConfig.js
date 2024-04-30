@@ -1,86 +1,87 @@
 const passport = require('passport')
-const local = require('passport-local').Strategy
-const bcrypt = require('bcrypt')
-const UserManager = require('../dao/userManager')
-const um = new UserManager()
+const github = require('passport-github2')
+const jwt = require('passport-jwt')
+const dotenv = require('dotenv')
+const userModel = require('../dao/models/userModel')
 
-const passportConfig = () => {
+dotenv.config()
+const searchToken = (req) => {
+    let token = null
+
+    if(req.signedCookie.ecommerce){
+        console.log('Cookie encontrada');
+        token = req.signedCookie.ecommerce
+    }
+
+    return token
+}
+
+const initPassport = () => {
     passport.use(
-        "register",
-        new local.Strategy(
+        'jwt',
+        new jwt.Strategy(
             {
-                usernameField: "email",
-                passReqToCallback: true,
+                secretOrKey: process.env.COOKIE_SECRET,
+                jwtFromRequest: new jwt.ExtractJwt.fromExtractors([searchToken]),
+                passReqToCallback: true
             },
-            async function (req, email, password, done) {
-            try {
-                    const { username, role } = req.body;
-        
-                    if (!username || !email || !password) {
-                        return done(null, false, { message: "Username, email, y password son requeridos" });
+            async (req, jwtPayload, done) => {
+                try {
+                    const user = await userModel.findById(jwtPayload.id)
+
+                    if(!user){
+                        return done(null, false, {message: 'El usuario no ha sido encontrado'})
                     }
-        
-                    const userExists = await um.getUserByFilter({ email });
                     
-                    if (userExists) {
-                        return done(null, false, { message: "Usuario existente" });
-                    }
-            
-                    const hashedPassword = await bcrypt.hash(password, 10);
-                    const newUser = await um.addUser(username, email, hashedPassword, role);
-                    
-                    return done(null, newUser);
+                    req.user = user
+
+                    return done(null, user)
                 } catch (error) {
-                    return done(error);
+                    return done(error)
                 }
             }
         )
     )
 
     passport.use(
-        "login",
-        new local.Strategy(
+        'github',
+        new github.Strategy(
             {
-                usernameField: "email",
-                passReqToCallback: true,
+                clientID: process.env.CLIENT_ID_GITHUB,
+                clientSecret: process.env.CLIENT_SECRET_GITHUB,
+                callbackURL: 'http://localhost:8080/api/sessions/calGithub'
             },
-            async function (req, email, password, done) {
-                try {
-                    const user = await um.getUserByFilter({ email });
-                    
-                    if (!user) {
-                        return done(null, false, { message: "Usuario no encontrado" });
-                    }
-                    
-                    const validate = await bcrypt.compare(password, user.password);
-                    console.log('validación de passwords: ', validate)
-                    console.log('password según DB: ', password)
-                    console.log('password según usuario: ', user.password)
-                    
-                    if (!validate) {
-                        return done(null, false, { message: "Contraseña incorrecta" });
+            async function(accessToken, refreshToken, profile, done){
+                try{
+                    let fullName = profile._json.name
+                    let email = profile._json.email
+
+                    if(!email){
+                        return done(null, false)
                     }
 
-                    return done(null, user);
-                } catch (error) {
-                    return done(error);
+                    let name = fullName.split(' ')
+                    let user = await userModel.findOne({email: email})
+
+                    if(!user){
+                        user = await userModel.create(
+                            {
+                                first_name: name[0],
+                                last_name: name[1],
+                                email,
+                                profileGithub: profile
+                            }
+                        )
+                    }
+
+                    return done(null, user)
+                } catch(error){
+                    return done(error)
                 }
+
             }
         )
-    );
-
-    passport.serializeUser((user, done) => {
-        done(null, user._id);
-    });
-    
-    passport.deserializeUser(async (id, done) => {
-        try {
-            const user = await um.getUserByFilter({ _id: id });
-            done(null, user);
-        } catch (error) {
-            done(error);
-        }
-    });
+    )
 }
 
-module.exports = passportConfig
+module.exports = initPassport
