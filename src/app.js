@@ -16,10 +16,8 @@ const sessionRouter = require('./routes/sessionsRouter.js')
 
 const viewRouter = router
 
-const PORT = process.env.COOKIE_SECRET || 8080
+const PORT = 8080
 const app = express()
-
-const io = socketIO(server)
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
@@ -49,16 +47,18 @@ app.get('*', (req, res) => {
     res.send('Error 404 - Not Found')
 })
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
     console.log(`Server Online en puerto ${PORT}`);
 });
+
+const io = socketIO(server)
 
 handleRealTimeProductsSocket(io)
 
 const connect = async () => {
     try{
         await mongoose.connect(`mongodb+srv://chibosio:${process.env.MONGO_PASSWORD}@cluster0.3jin0k1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&dbName=ecommerce`)
-        console.log("DB online...!!");z
+        console.log("DB online...!!");
     } catch(error){
         console.log("Conexión fallida. Detalle:", error.message);
     }

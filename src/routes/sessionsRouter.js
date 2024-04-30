@@ -1,5 +1,5 @@
-const UserManager = require('../dao/userManager')
-const userModel = require('../dao/models/usersModel')
+const UserManager = require('../dao/managers/userManager')
+const userModel = require('../dao/models/userModel')
 
 const Router = require('express').Router
 const passport = require('passport')

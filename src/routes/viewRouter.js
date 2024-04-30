@@ -1,7 +1,7 @@
 const Router = require('express').Router;
 const socketIo = require('socket.io')
-const ProductManager = require('../dao/productManager.js')
-const UserManager = require('../dao/userManager.js') 
+const ProductManager = require('../dao/managers/productManager.js')
+const UserManager = require('../dao/managers/userManager.js') 
 const productModel = require('../dao/models/productModel.js')
 const cartModel = require('../dao/models/cartModel.js')
 

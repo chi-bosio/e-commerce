@@ -1,5 +1,5 @@
 const mongoose = require('mongoose')
-
+const uniqueValidator = require('mongoose-unique-validator')
 const userColl = 'users'
 const userSchema = new mongoose.Schema({
     first_name: String,
@@ -9,13 +9,18 @@ const userSchema = new mongoose.Schema({
     }, 
     age: Number,
     password: String,
-    range: {
-        type: String,
-        default: 'user'
+    cart: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'cartModel'
+    },
+    role: {
+        type: String, default: 'user'
     }
 },{
     timestamps: true
 })
+
+userSchema.plugin(uniqueValidator, {message: 'Ya elegido'})
 
 const userModel = mongoose.model(userColl, userSchema)
 module.exports = userModel

@@ -1,4 +1,4 @@
-const CartManager = require('../dao/cartManager.js');
+const CartManager = require('../dao/managers/cartManager.js');
 const {default: mongoose} = require('mongoose')
 const path = require('path');
 
