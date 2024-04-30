@@ -8,7 +8,7 @@ dotenv.config()
 const searchToken = (req) => {
     let token = null
 
-    if(req.signedCookie.ecommerce){
+    if(req.signedCookies.ecommerce){
         console.log('Cookie encontrada');
         token = req.signedCookie.ecommerce
     }
