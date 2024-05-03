@@ -1,11 +1,9 @@
 const CartManager = require('../dao/managers/cartManager.js');
 const {default: mongoose} = require('mongoose')
-const path = require('path');
 
 const Router = require('express').Router;
 const router = Router();
 
-let route = path.join(__dirname, '..', 'data', 'carts.json');
 const cm = new CartManager();
 
 router.post('/', async (req, res) => {

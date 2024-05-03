@@ -1,32 +1,103 @@
-const path = require('path')
 const ProductManager = require('../dao/managers/productManager');
-const productModel = require('../dao/models/productModel');
+const userModel = require('../dao/models/userModel');
+const {ensureAuthenticated, ensureAccess} = require('../middlewares/auth')
+const passport = require('passport')
 
-const Router=require('express').Router;
+const Router=require('express');
 const router=Router()
 
 const pm = new ProductManager()
 
-router.get('/',async(req,res)=>{
-    try {
-        const { page = 1, limit = 5, sort = "asc" } = req.query;
-        const options = {
-            page: parseInt(page),
-            limit: parseInt(limit),
-            sort: { price: sort === "asc" ? 1 : -1 },
-        };
+router.get(
+    '/',
+    ensureAuthenticated,
+    ensureAccess(['public']),
+    async(req,res)=>{
+        let { page = 1, limit = 5, sort, query } = req.query;
+        let queryParams = {}
 
-        const products = await productModel.paginate({}, options);
-        const jsonProducts = JSON.stringify(products, null, 2); 
+        if(query){
+            queryParams = {...queryParams, category: query}
+        }
+
+        const offset = (page-1) * limit
+
+        try {
+            const tProducts = await pm.Product.countDocuments(queryParams)
+            const tPages = Math.ceil(tProducts/limit)
+
+            let products = await pm.Product.find(
+                queryParams, 
+                {}, 
+                {
+                    skip: offset,
+                    limit: parseInt(limit),
+                    sort: sort ? {price: sort === 'asc' ? 1 : -1} : {}
+                }
+            ).lean()
+
+            const res = {
+                status: "success",
+                payload: products,
+                tPages,
+                prevPage: page > 1 ? page - 1 : null,
+                nextPage: page < tPages ? page + 1 : null,
+                page,
+                hasPrevPage: page > 1,
+                hasNextPage: page < tPages,
+                prevLink: page > 1 ? `/?limit=${limit}&page=${page - 1}` : null,
+                nextLink:
+                  page < tPages ? `/?limit=${limit}&page=${page + 1}` : null
+              };
         
-        res.setHeader("Content-Type", "application/json");
-        res.send(jsonProducts);
-    } catch (error) {
-        res.status(404).json({ error: error.message });
-    }
+              res.render("home", { products });
+        } catch (error) {
+            res.status(404).json({ error: error.message });
+        }
     
-});
+    }
+);
 
+router.get(
+    "/products",
+    ensureAuthenticated,
+    ensureAccess(["user", "admin"]),
+    async (req, res) => {
+      let { limit = 10, page = 1, sort, query } = req.query;
+      let queryParams = {};
+  
+      if (query) {
+        queryParams = { ...queryParams, category: query };
+      }
+
+      let user = await userModel.findById(req.user.user._id).lean();
+
+      if (!user) {
+        return res.send("Usuario no encontrado");
+      }
+  
+      const offset = (page - 1) * limit;
+  
+      try {
+        let products = await pm.Product.find(
+          queryParams,
+          {},
+          {
+            skip: offset,
+            limit: parseInt(limit),
+            sort: sort ? { price: sort === "asc" ? 1 : -1 } : {},
+          }
+        ).lean();
+  
+        res.render("products", { products, user });
+      } catch (error) {
+        res
+          .status(500)
+          .json({ error: "Error al obtener los productos", error: error.message });
+      }
+    }
+  );
+  
 router.get('/:pid', async (req, res) => {
     const pid = req.params.pid
     try {
