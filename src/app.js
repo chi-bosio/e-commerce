@@ -1,4 +1,4 @@
-const express=require('express');
+const express= require('express');
 const session = require('express-session')
 const socketIO = require('socket.io')
 const engine = require('express-handlebars').engine
@@ -9,20 +9,38 @@ const cookieParser = require('cookie-parser')
 const dotenv = require('dotenv')
 
 const passportConfig = require('./config/passportConfig.js')
+const ProductManager = require('../src/dao/managers/productManager.js')
+const pm = new ProductManager
 
 const productRouter = require('./routes/productRouter.js')
 const cartRouter = require('./routes/cartRouter.js')
-const {router, handleRealTimeProductsSocket} = require('./routes/viewRouter.js')
+const viewRouter = require('./routes/viewRouter.js')
 const sessionRouter = require('./routes/sessionsRouter.js')
-
-const viewRouter = router
 
 const PORT = 8080
 const app = express()
+app.use(cookieParser(process.env.COOKIE_SECRET))
+dotenv.config()
+
+app.use(session({
+    secret: 'miSecretKey',
+    resave: false,
+    saveUninitialized: false
+  }));
+
+app.use(passport.initialize());
+// app.use((req, res, next) => {
+//     console.log("Contenido de req.session:", req.session);
+//     console.log("Valor de req.session.user:", req.session.user);
+//     console.log("Valor de req.user:", req.user);
+//     console.log(req.signedCookies);
+//     // console.log("req.user._id", req.user._id);
+
+//     next();
+//   });
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
-app.use(cookieParser(process.env.COOKIE_SECRET))
 
 passportConfig()
 app.use(passport.initialize())
@@ -54,8 +72,6 @@ const server = app.listen(PORT, () => {
 
 const io = socketIO(server)
 
-handleRealTimeProductsSocket(io)
-
 const connect = async () => {
     try{
         await mongoose.connect(`mongodb+srv://chibosio:${process.env.MONGO_PASSWORD}@cluster0.3jin0k1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&dbName=ecommerce`)
@@ -65,3 +81,27 @@ const connect = async () => {
     }
 } 
 connect()
+
+io.on("connection", (socket) => {
+    socket.on("newProduct", async (title, description, price, thumbnail, code, stock, category, status) => {
+      await pm.addProduct(title, description, price, thumbnail, code, stock, category, status);
+      const updatedProducts = await pm.getProduct();
+      io.emit("products", updatedProducts);
+    });
+  
+    socket.on("deleteProduct", async (id) => {
+      try {
+        await pm.deleteProduct(id);
+        io.emit("products", await pm.getProduct());
+      } catch (error) {
+        console.error("Error al eliminar el producto:", error.message);
+      }
+    });
+  
+    socket.on("requestInitialProducts", async () => {
+      const products = await pm.getProduct();
+      socket.emit("initialProducts", products);
+    });
+});
+
+module.exports = io
