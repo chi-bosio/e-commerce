@@ -1,41 +1,65 @@
 const passport = require('passport')
 const github = require('passport-github2')
-const jwt = require('passport-jwt')
-const dotenv = require('dotenv')
+const local = require('passport-local')
+const bcrypt = require('bcrypt')
+
+const UserManager = require('../dao/managers/userManager')
 const userModel = require('../dao/models/userModel')
+const config = require('./config')
 
-dotenv.config()
-const searchToken = (req) => {
-    let token = null
+const um = new UserManager()
 
-    if(req.signedCookies.ecommerce){
-        console.log('Cookie encontrada');
-        token = req.signedCookie.ecommerce
-    }
-
-    return token
-}
-
-const initPassport = () => {
+const passportConfig = () => {
     passport.use(
-        'jwt',
-        new jwt.Strategy(
+        'register',
+        new local.Strategy(
             {
-                secretOrKey: process.env.COOKIE_SECRET,
-                jwtFromRequest: new jwt.ExtractJwt.fromExtractors([searchToken]),
+                usernameField:"email",
                 passReqToCallback: true
             },
-            async (req, jwtPayload, done) => {
+            async (req, email, password, done) => {
                 try {
-                    const user = await userModel.findById(jwtPayload.id)
-
-                    if(!user){
-                        return done(null, false, {message: 'El usuario no ha sido encontrado'})
+                    let {username, role} = req.body
+                    if(!username || !email || !password){
+                        return done(null, false, {message:"Complete los datos faltantes"})
                     }
-                    
-                    req.user = user
+
+                    let userExist = await um.getUserByFilter({email})
+                    if(userExist){
+                        return done(null, false, {message:"Usuario existente"})
+                    }
+
+                    const hashedPass = bcrypt.hashSync(password, bcrypt.genSaltSync(10))
+                    const newUser = await um.addUser(username, email, hashedPass, role)
+                    return done(null, newUser)
+                } catch (error) {
+                    return done(error)
+                }
+            }
+        )
+    )
+
+    passport.use(
+        "login",
+        new local.Strategy(
+            {
+                usernameField:"email",
+            },
+            async (username, password, done)=>{
+                try {
+                    let user = await um.getUserByFilter({email: username})
+                    if(!user){
+                        res.setHeader('Content-Type','application/json');
+                        return res.status(401).json({error:`Credenciales incorrectas`})
+                    }
+
+                    let validaPassword = (user, password) => bcrypt.compareSync(password, user.password)
+                    if(!validaPassword){
+                        return done(null, false, {message:`Credenciales inválidas`})
+                    }
 
                     return done(null, user)
+
                 } catch (error) {
                     return done(error)
                 }
@@ -51,30 +75,14 @@ const initPassport = () => {
                 clientSecret: process.env.CLIENT_SECRET_GITHUB,
                 callbackURL: 'http://localhost:8080/api/sessions/calGithub'
             },
-            async function(accessToken, refreshToken, profile, done){
+            async (accessToken, refreshToken, profile, done) => {
                 try{
-                    let fullName = profile._json.name
+                    let name = profile._json.username
                     let email = profile._json.email
-
-                    if(!email){
-                        return done(null, false)
-                    }
-
-                    let name = fullName.split(' ')
-                    let user = await userModel.findOne({email: email})
-
+                    let user = await userModel.findOne({email})
                     if(!user){
-                        user = await userModel.create(
-                            {
-                                first_name: name[0],
-                                last_name: name[1],
-                                email,
-                                profileGithub: profile
-                            }
-                        )
+                        user = await userModel.create({name, email, profileGithub: profile})
                     }
-
-                    return done(null, user)
                 } catch(error){
                     return done(error)
                 }
@@ -82,6 +90,7 @@ const initPassport = () => {
             }
         )
     )
+    
 }
 
-module.exports = initPassport
+module.exports = passportConfig
