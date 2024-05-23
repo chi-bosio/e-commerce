@@ -1,5 +1,4 @@
 const cartModel = require("../models/cartModel");
-const productModel= require("../models/productModel")
 
 class CartManager{
 
@@ -35,7 +34,7 @@ class CartManager{
             let carts = await cartModel.findById(cid);
 
             if (!carts) {
-                return { error: 'Carrito no encontrado' };
+                return { error: `Carrito con ID ${cid} no encontrado`};
             }
 
             const existingProduct = carts.products.find(p => p.product === pid);
