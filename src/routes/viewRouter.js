@@ -1,42 +1,30 @@
+const ViewsController = require('../controller/viewsController')
+
 const Router = require('express').Router;
-const io = require('../app.js')
-const ProductManager = require('../dao/managers/productManager.js')
-const userModel = require('../dao/models/userModel.js')
-const {ensureAuthenticated, ensureAccess} = require('../middlewares/auth.js')
-
 const router = Router();
-const pm = new ProductManager()
 
-router.get("/", async (req, res) => {
-    res.status(200).render('home');
-});
+function handleRealTimeProductsSocket(io) {
+    io.on('connection', async(socket) => {
+        console.log('Usuario conectado a la ruta /realtimeproducts');
+        const products = await productManager.getProducts();
+        socket.emit('products', products);
+    });
+}
 
-router.get(
-    "/realtimeproducts",
-    ensureAuthenticated,
-    ensureAccess(['admin']),
-    async (req, res) => {
-    const products = await pm.getProduct();
+router.get("/", ViewsController.getHome);
 
-    let user = await userModel.findById(req.user.user._id).lean()
-    if(!user){
-        res.setHeader("Content-Type", "application/json");
-        return res.json('Usuario no encontrado')
-    }
-    res.status(200).render("realtimeproducts", { products, user });
-});
+router.get('/products', ViewsController.getProducts)
 
-router.post('/realtimeproducts', async (req, res) => {
-    const {title, description, code, price, stock, category, thumbnail} = req.boby
-    const status = true
+router.get('/products/:pid', ViewsController.getProductById)
 
-    try{
-        await pm.addProduct(title, description, code, price, stock, category, thumbnail, status)
-        res.status(201).json('Producto agregado')
-        io.emit('products', await pm.getProduct())
-    } catch(error){
-        res.status(400).json({error: 'Error al agregar el producto'})
-    }
-})
+router.get('/cart/:cid', ViewsController.getCartById)
 
-module.exports = router
+router.get('/login', ViewsController.getLogin)
+
+router.get('/register', ViewsController.getRegister)
+
+router.get('/profile', ViewsController.getProfile)
+
+router.get('/realtimeproducts', ViewsController.getRealTimeProducts)
+
+module.exports = {router, handleRealTimeProductsSocket}
