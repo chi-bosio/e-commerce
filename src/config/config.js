@@ -1,10 +1,9 @@
 const dotenv = require('dotenv')
 
 dotenv.config({
-    path: '../../.env',
+    path: './.env',
     override: true
 })
-
 const config = {
     PORT: process.env.PORT,
     MONGO_URL: process.env.MONGO_URL,

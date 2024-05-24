@@ -1,5 +1,5 @@
 const passport = require('passport')
-const github = require('passport-github2')
+const github = require('passport-github2').Strategy
 const local = require('passport-local')
 const bcrypt = require('bcrypt')
 
@@ -40,6 +40,30 @@ const passportConfig = () => {
     )
 
     passport.use(
+        'github',
+        new github(
+            {
+                clientID: config.CLIENT_ID_GITHUB,
+                clientSecret: config.CLIENT_SECRET_GITHUB,
+                callbackURL: 'http://localhost:8080/api/sessions/calGithub'
+            },
+            async (accessToken, refreshToken, profile, done) => {
+                try{                
+                    let name = profile._json.username
+                    let email = profile._json.email
+                    let user = await userModel.findOne({email})
+                    if(!user){
+                        user = await userModel.create({name, email, profileGithub: profile})
+                    }
+                } catch(error){
+                    return done(error)
+                }
+
+            }
+        )
+    )
+
+    passport.use(
         "login",
         new local.Strategy(
             {
@@ -66,31 +90,15 @@ const passportConfig = () => {
             }
         )
     )
-
-    passport.use(
-        'github',
-        new github.Strategy(
-            {
-                clientID: process.env.CLIENT_ID_GITHUB,
-                clientSecret: process.env.CLIENT_SECRET_GITHUB,
-                callbackURL: 'http://localhost:8080/api/sessions/calGithub'
-            },
-            async (accessToken, refreshToken, profile, done) => {
-                try{
-                    let name = profile._json.username
-                    let email = profile._json.email
-                    let user = await userModel.findOne({email})
-                    if(!user){
-                        user = await userModel.create({name, email, profileGithub: profile})
-                    }
-                } catch(error){
-                    return done(error)
-                }
-
-            }
-        )
-    )
     
+    passport.serializeUser((user, done) => {
+        return done(null, user._id)
+    })
+
+    passport.deserializeUser(async (id, done) => {
+        const user = await um.getUserByFilter({_id: id})
+        return done(null, user)
+    })
 }
 
 module.exports = passportConfig
