@@ -16,7 +16,7 @@ class SessionController{
     }
 
     static async register(req, res){
-        res.redirect('/register?message=Registro correcto')
+        res.redirect('/login')
     }
 
     static async loginError(req, res){

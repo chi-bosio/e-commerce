@@ -13,6 +13,13 @@ router.get('/current', authenticate, SessionController.currentUser)
 
 router.get('/registerError', SessionController.registerError)
 
+router.post(
+    '/register',
+    passport.authenticate(
+        'register', {failureRedirect: '/api/sessions/registerError'}
+    ),
+    SessionController.register
+)
 router.get('/loginError', SessionController.loginError)
 
 router.post(

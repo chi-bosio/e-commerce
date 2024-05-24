@@ -7,18 +7,10 @@
         {{/if}}
 </div>
 
-<form action="/register" method="post">
+<form action="/api/sessions/register" method="post">
     <div>
-        <label for="first_name">Nombre:</label>
-        <input type="text" id="first_name" name="first_name" required>
-    </div>
-    <div>
-        <label for="last_name">Apellido:</label>
-        <input type="text" id="last_name" name="last_name" required>
-    </div>
-    <div>
-        <label for="age">Edad:</label>
-        <input type="text" id="age" name="age" required>
+        <label for="username">Nombre:</label>
+        <input type="text" id="username" name="username" required>
     </div>
     <div>
         <label for="email">Email:</label>

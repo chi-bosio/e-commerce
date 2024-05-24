@@ -73,8 +73,7 @@ const passportConfig = () => {
                 try {
                     let user = await um.getUserByFilter({email: username})
                     if(!user){
-                        res.setHeader('Content-Type','application/json');
-                        return res.status(401).json({error:`Credenciales incorrectas`})
+                        return done(null, false, {message:`Credenciales incorrectas`})
                     }
 
                     let validaPassword = (user, password) => bcrypt.compareSync(password, user.password)

@@ -1,7 +1,7 @@
 const ProductManager = require('../dao/managers/productManager')
 const UserManager = require('../dao/managers/userManager')
 const productModel = require('../dao/models/productModel')
-const {cartModel} = require('../dao/models/cartModel')
+const cartModel = require('../dao/models/cartModel')
 
 let um = new UserManager()
 let pm = new ProductManager()
@@ -30,7 +30,6 @@ class ViewsController{
         if(req.session.user){
             try {
                 const user = await um.getUserByFilter({username: req.session.user.username})
-                
                 if(user.role === 'admin'){
                     welcomeMessage = `Bienvenido ${user.username}. Eres un administrador`
                 } else{
