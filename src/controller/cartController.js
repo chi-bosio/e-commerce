@@ -1,0 +1,126 @@
+const CartService = require('../services/cartService')
+const ProductService = require('../services/productService')
+const TicketService = require('../services/ticketService')
+
+class CartController{
+    static async getAllCarts(req, res){
+        try {
+            const carts = await CartService.getAllCarts()
+            res.json(carts)
+        } catch (error) {
+            res.status(500).json({error: `Error al obtener los carritos: ${error.message}`})
+        }
+    }
+
+    static async createCart(req, res){
+        const initialProducts = req.body.products || []
+
+        try {
+            const newCarts = await CartService.createCart(initialProducts)
+            res.json(newCarts)
+        } catch (error) {
+            res.status(500).json({error: `Error al crear el carrito: ${error.message}`})
+        }
+    }
+
+    static async getCartById(req, res){
+        const {cid} = req.params
+
+        try {
+            const cartDTO = await CartService.getCartById(cid)
+            res.json(cartDTO)
+        } catch (error) {
+            res.status(500).json({error: `Error al obtener el carrito con ID ${cid}: ${error.message}`})
+        }
+    }
+
+    static async addProductToCart(req, res){
+        const {cid, pid} = req.params
+
+        try {
+            const addedProduct = await CartService.addProductToCart(cid, pid)
+            res.json(addedProduct)
+        } catch (error) {
+            res.status(500).json({error: `Error al agregar el producto: ${error.message}`})
+        }
+    }
+
+    static async removeProductFromCart(req, res){
+        const {cid, pid} = req.params
+
+        try {
+            await CartService.removeProductFromCart(cid, pid)
+            res.json({message: 'El producto ha sido eliminado del carrito con éxito'})
+        } catch (error) {
+            res.status(500).json({error: `Error al eliminar el producto del carrito: ${error.message}`})
+        }
+    }
+
+    static async updateProductQuantity(req, res){
+        const {cid, pid} = req.params
+        const {quantity} = req.body
+
+        try {
+            const updatedProduct = await CartService.updateProductQuantity(cid, pid, quantity)
+            res.json(updatedProduct)
+        } catch (error) {
+            res.status(500).json({error: `Error al actualizar la cantidad del producto: ${error.message}`})
+        }
+    }
+
+    static async removeAllProductsFromCart(req, res){
+        const {cid} = req.params
+
+        try {
+            await CartService.removeAllProductsFromCart(cid)
+            res.json({message: 'El carrito ha sido eliminado con éxito'})
+        } catch (error) {
+            res.status(500).json({error: `Error al eliminar el carrito: ${error.message}`})
+        }
+    }
+
+    static async purchaseCart(req, res){
+        const {cid} = req.params
+        const userEmail = req.session.user.email
+
+        try {
+            const cart = await CartService.getCartById(cid)
+            if(!cart){
+                return res.status(404).json({error: 'Carrito no encontrado'})
+            }
+
+            let totalAmount = 0
+            const purchaseProducts = []
+
+            for(const item of cart.products){
+                const product = await ProductService.getProductById(item.pid)
+
+                if(product.stock >= item.quantity){
+                    product.stock -= item.quantity;
+                    await ProductService.updateProduct(product._id, {stock: product.stock});
+                    totalAmount += product.price * item.quantity;
+
+                    purchaseProducts.push({
+                        pid: product._id,
+                        quantity: item.quantity,
+                        price: product.price
+                    });
+                } else{
+                    res.status(400).json({error: `No hay suficiente stock para el producto ${product.name}`})
+                }
+            }
+
+            const newTicket = await TicketService.createTicket({
+                amount: totalAmount,
+                purchaser: userEmail
+            })
+
+            await CartService.removeAllProductsFromCart(cid)
+            res.json({message: 'Compra realizada con éxito', ticket: newTicket})
+        } catch (error) {
+            res.status(500).json({error: `Error al realizar la compra: ${error.message}`})
+        }
+    }
+}
+
+module.exports = CartController
