@@ -1,6 +1,6 @@
 const ProductManager = require('../dao/managers/productManager')
 const UserManager = require('../dao/managers/userManager')
-const {productModel} = require('../dao/models/productModel')
+const productModel = require('../dao/models/productModel')
 const {cartModel} = require('../dao/models/cartModel')
 
 let um = new UserManager()
@@ -24,12 +24,13 @@ class ViewsController{
             nextPage,
             hasPrevPage,
             hasNextPage
-        } = await productModel.paginate({}, {limit: 2, page: page, lean: true})
-
+        } = await productModel.paginate({}, {limit: 10, page: page, lean: true})
+        
         let welcomeMessage = ''
         if(req.session.user){
             try {
                 const user = await um.getUserByFilter({username: req.session.user.username})
+                
                 if(user.role === 'admin'){
                     welcomeMessage = `Bienvenido ${user.username}. Eres un administrador`
                 } else{

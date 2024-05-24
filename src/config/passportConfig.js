@@ -1,5 +1,5 @@
 const passport = require('passport')
-const github = require('passport-github2').Strategy
+const github = require('passport-github2')
 const local = require('passport-local')
 const bcrypt = require('bcrypt')
 
@@ -41,7 +41,7 @@ const passportConfig = () => {
 
     passport.use(
         'github',
-        new github(
+        new github.Strategy(
             {
                 clientID: config.CLIENT_ID_GITHUB,
                 clientSecret: config.CLIENT_SECRET_GITHUB,

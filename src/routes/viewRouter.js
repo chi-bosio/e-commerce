@@ -6,7 +6,7 @@ const router = Router();
 function handleRealTimeProductsSocket(io) {
     io.on('connection', async(socket) => {
         console.log('Usuario conectado a la ruta /realtimeproducts');
-        const products = await productManager.getProducts();
+        const products = await ViewsController.getProducts;
         socket.emit('products', products);
     });
 }

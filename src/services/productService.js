@@ -5,7 +5,7 @@ class ProductService{
         this.productDAO = new ProductDAO()
     }
 
-    async getProducts(limit = 4){
+    async getProducts(limit = 10){
         return await this.productDAO.getProducts(limit)
     }
 

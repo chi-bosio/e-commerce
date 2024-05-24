@@ -1,6 +1,11 @@
-<h1>Productos:</h1>
+<h1>Productos</h1>
+
+{{#if welcomeMessage}}
+    <p>{{welcomeMessage}}</p>
+{{/if}}
+
 <ul>
-  {{#each product}}
+  {{#each products}}
     <li>{{this.title}} - {{description}} - $ {{price}} </li>
     <button>Agregar al carrito</button>
   {{/each}}
@@ -18,4 +23,4 @@
   <a href="/products?page={{nextPage}}">Página siguiente</a>
 {{/if}}
 
-<a href="/products?page={{totalPages}}">Última página</a>
+<a href="/products?page={{tPages}}">Última página</a>

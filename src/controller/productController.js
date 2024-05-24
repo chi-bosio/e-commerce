@@ -5,7 +5,7 @@ const ProductDTO = require('../dto/productDTO')
 class ProductController{
     static async getAllProducts(req, res){
         try {
-            const {page = 1, limit = 4} = req.query
+            const {page = 1, limit = 10} = req.query
             const options = {
                 page: parseInt(page),
                 limit: parseInt(limit)
