@@ -32,7 +32,7 @@ router.post(
 
 router.get(
     '/github',
-    passport.authenticate('githubLogin', {}),
+    passport.authenticate('github', {}),
     async (req, res) => {}
 )
 
