@@ -4,6 +4,7 @@ const {isAdmin} = require('../middlewares/roleAuth')
 const Router=require('express').Router;
 const router=Router()
 
+router.get('/mockingproducts', ProductController.mockProducts)
 
 router.get('/', ProductController.getAllProducts);
   
