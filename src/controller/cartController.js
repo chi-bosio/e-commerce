@@ -1,6 +1,8 @@
 const CartService = require('../services/cartService')
 const ProductService = require('../services/productService')
 const TicketService = require('../services/ticketService')
+const CustomError = require('../errors/customError')
+const errorList = require('../utils/errorList')
 
 class CartController{
     static async getAllCarts(req, res){
@@ -23,14 +25,21 @@ class CartController{
         }
     }
 
-    static async getCartById(req, res){
+    static async getCartById(req, res, next){
         const {cid} = req.params
 
         try {
             const cartDTO = await CartService.getCartById(cid)
+            if(!cartDTO){
+                throw new CustomError(
+                    errorList.CART_NOT_FOUND.status, 
+                    errorList.CART_NOT_FOUND.code, 
+                    errorList.CART_NOT_FOUND.message
+                )
+            }
             res.json(cartDTO)
         } catch (error) {
-            res.status(500).json({error: `Error al obtener el carrito con ID ${cid}: ${error.message}`})
+            next(error)
         }
     }
 

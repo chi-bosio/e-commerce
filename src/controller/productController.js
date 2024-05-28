@@ -1,6 +1,9 @@
 const {productModel} = require('../dao/models/productModel')
 const ProductService = require('../services/productService')
 const ProductDTO = require('../dto/productDTO')
+const generateMockProducts = require('../utils/mocking')
+const CustomError = require('../errors/customError')
+const errorList = require('../utils/errorList')
 
 class ProductController{
     static async getAllProducts(req, res){
@@ -18,13 +21,20 @@ class ProductController{
         }
     }
 
-    static async getProductById(req, res){
+    static async getProductById(req, res, next){
         const {pid} = req.params
         try {
             const product = await ProductService.getProductById(pid)
+            if(!product){
+                throw new CustomError(
+                    errorList.PRODUCT_NOT_FOUND.status,
+                    errorList.PRODUCT_NOT_FOUND.code,
+                    errorList.PRODUCT_NOT_FOUND.message
+                )
+            }
             res.json(product)
         } catch (error) {
-            res.status(500).json({error: `Error al obtener el producto con ID ${pid}: ${error.message}`})   
+            next(error)   
         }
     }
 
@@ -60,6 +70,11 @@ class ProductController{
         } catch (error) {
             res.status(500).json({error: `Error al eliminar el producto: ${error.message}`})   
         }
+    }
+
+    static async mockProducts(req, res){
+        const mockProduct = generateMockProducts(100)
+        res.json(mockProduct)
     }
 }
 
