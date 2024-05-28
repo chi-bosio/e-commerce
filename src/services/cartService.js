@@ -1,5 +1,7 @@
 const {CartDAO} = require('../dao/managers/factory')
 const CartDTO = require('../dto/cartDTO')
+const CustomError = require('../errors/customError')
+const errorList = require('../utils/errorList')
 
 class CartService{
     constructor(){
@@ -17,7 +19,11 @@ class CartService{
     async getCartById(cid){
         const cart = await this.cartDAO.getCartById(cid)
         if(!cart){
-            throw new Error('No se encontró ningún carrito')
+            throw new CustomError(
+                errorList.CART_NOT_FOUND.status,
+                errorList.CART_NOT_FOUND.code,
+                errorList.CART_NOT_FOUND.message
+            )
         }
         await cart.populate('products.pid')
         return new CartDTO(cart)
