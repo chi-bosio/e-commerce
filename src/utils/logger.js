@@ -34,7 +34,7 @@ const devLogger = createLogger(
         transports: [
             new transports.Console({level: 'debug'}),
             new transports.File({
-                filename: path.join(__dirname, '../logs/error.log'),
+                filename: path.join(__dirname, '../logs/errors.log'),
                 level: 'error',
                 format: format.combine(
                     format.uncolorize(),
@@ -56,7 +56,7 @@ const prodLogger = createLogger(
         transports: [
             new transports.Console({level: 'info'}),
             new transports.File({
-                filename: path.join(__dirname, '../logs/error.log'),
+                filename: path.join(__dirname, '../logs/errors.log'),
                 level: 'error',
                 format: format.combine(
                     format.uncolorize(),
