@@ -1,8 +1,12 @@
 const productModel = require("../models/productModel");
+const logger = require('../../utils/logger')
 
 
 class ProductManager{
-
+    constructor(){
+        
+    }
+    
     async addProduct(title, description, price, thumbnail, code, stock, category, status){
         try {
             await productModel.create({
@@ -38,7 +42,8 @@ class ProductManager{
             return { message: `Producto con id ${id} encontrado!!
                         ${product}` };
         } catch (error) {
-            throw new Error("Error al obtener el producto: " + error.message);
+            logger.error(`Error al obtener el producto: ${error.message}`)
+            throw error;
         }
     }
 
