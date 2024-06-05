@@ -6,6 +6,8 @@ const router=Router()
 
 router.get('/mockingproducts', ProductController.mockProducts)
 
+router.get('/loggerTest', ProductController.loggerTest)
+
 router.get('/', ProductController.getAllProducts);
   
 router.get('/:pid', ProductController.getProductById);
