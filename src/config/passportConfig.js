@@ -6,6 +6,7 @@ const bcrypt = require('bcrypt')
 const UserManager = require('../dao/managers/userManager')
 const userModel = require('../dao/models/userModel')
 const config = require('./config')
+const logger = require('../utils/logger')
 
 const um = new UserManager()
 
@@ -71,14 +72,16 @@ const passportConfig = () => {
             },
             async (username, password, done)=>{
                 try {
+                    logger.info(`Login attempt for user ${username}`)
                     let user = await um.getUserByFilter({email: username})
                     if(!user){
-                        return done(null, false, {message:`Credenciales incorrectas`})
+                        res.setHeader('Content-Type','application/json');
+                        return res.status(401).json({error:`Credenciales incorrectas`})
                     }
 
                     let validaPassword = (user, password) => bcrypt.compareSync(password, user.password)
                     if(!validaPassword){
-                        return done(null, false, {message:`Credenciales inválidas`})
+                        return done(null, false)
                     }
 
                     return done(null, user)
