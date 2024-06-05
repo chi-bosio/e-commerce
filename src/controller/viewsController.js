@@ -2,6 +2,7 @@ const ProductManager = require('../dao/managers/productManager')
 const UserManager = require('../dao/managers/userManager')
 const productModel = require('../dao/models/productModel')
 const cartModel = require('../dao/models/cartModel')
+const logger = require('../utils/logger')
 
 let um = new UserManager()
 let pm = new ProductManager()
@@ -36,7 +37,7 @@ class ViewsController{
                     welcomeMessage = `Bienvenido ${user.username}.`
                 }
             } catch (error) {
-                res.status(500).json({error: `Error al obtener información del usuario: ${error.message}`})
+                logger.error(`Error al obtener información del usuario: ${error}`)
             }
         }
 
@@ -60,7 +61,8 @@ class ViewsController{
             }
             res.render('singleproduct', {product})
         } catch (error) {
-            res.status(500).json({error: `Error al obtener el producto con ID ${pid}: ${error.message}`})
+            logger.error(`Error al obtener el producto con ID ${pid}: ${error.message}`)
+            res.status(500).send('Error al procesar la solicitud')
         }
     }
 
@@ -83,7 +85,8 @@ class ViewsController{
 
             res.render('cart', {cart: {...cart, products: productsDetails}})
         } catch (error) {
-            res.status(500).json({error: `Error al obtener el carrito con ID ${cid}: ${error.message}`})
+            logger.error(`Error al obteenr el carrito: ${error}`)
+            res.status(500).send('Error al procesar la solicitud')
         }
     }
 
