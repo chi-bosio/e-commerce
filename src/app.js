@@ -5,9 +5,11 @@ const engine = require('express-handlebars').engine
 const path = require('path')
 const mongoose = require('mongoose')
 const passport = require('passport')
-const dotenv = require('dotenv')
 const http = require('http')
 const connectMongo = require('connect-mongo')
+
+const errorHandler = require('./middlewares/errorHandler.js')
+const logger = require('./utils/logger.js')
 
 const productRouter = require('./routes/productRouter.js')
 const cartRouter = require('./routes/cartRouter.js')
@@ -22,6 +24,13 @@ const PORT = 8080
 const app = express()
 const server = http.createServer(app)
 const io = socketIO(server)
+
+app.use((req, res, next) => {
+  logger.http(`${req.method} - ${req.url}`)
+  next()
+})
+
+app.use(errorHandler)
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
@@ -60,7 +69,7 @@ app.use((req, res) => {
 })
 
 server.listen(PORT, () => {
-  console.log(`Server Online en puerto ${PORT}`);
+  logger.info(`Server Online en puerto ${PORT}`);
 })
 
 const connect = async () => {
@@ -68,9 +77,10 @@ const connect = async () => {
       await mongoose.connect(config.MONGO_URL, {
         dbName: config.DB_NAME
       })
-      console.log("DB online...!!");
+      logger.info("DB online...!!");
   } catch(error){
-      console.log("Conexión fallida. Detalle:", error.message);
+      logger.error("Conexión fallida. Detalle:", error.message);
   }
 } 
+
 connect()
