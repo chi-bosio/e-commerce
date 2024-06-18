@@ -16,7 +16,7 @@ class CartManager{
     async getCartById(id) {
         try {
 
-            let cart=await cartModel.findOne({_id:id}).populate("products.product")
+            let cart=await cartModel.findOne({_id:id}).populate("products.pid")
             
             if (!cart) {
                 return null;

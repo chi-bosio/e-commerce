@@ -1,4 +1,4 @@
-const {productModel} = require('../dao/models/productModel')
+const productModel = require('../dao/models/productModel')
 const ProductService = require('../services/productService')
 const ProductDTO = require('../dto/productDTO')
 const generateMockProducts = require('../utils/mocking')

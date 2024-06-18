@@ -6,7 +6,7 @@ let CartDAO
 switch (config.PERSISTENCE) {
     case 'mongo':
         ProductDAO = require('./productManager')
-        CartDAO = require('./userManager')
+        CartDAO = require('./cartManager')
         break;
 
     case 'fs':

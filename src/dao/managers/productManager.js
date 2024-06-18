@@ -39,8 +39,7 @@ class ProductManager{
     async getProductById(id){
         try {
             const product = await productModel.findById({_id: id})
-            return { message: `Producto con id ${id} encontrado!!
-                        ${product}` };
+            return product;
         } catch (error) {
             logger.error(`Error al obtener el producto: ${error.message}`)
             throw error;
