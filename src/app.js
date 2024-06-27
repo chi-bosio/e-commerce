@@ -7,6 +7,8 @@ const mongoose = require('mongoose')
 const passport = require('passport')
 const http = require('http')
 const connectMongo = require('connect-mongo')
+const swaggerJsdoc = require('swagger-jsdoc')
+const swaggerUi = require('swagger-ui-express')
 
 const errorHandler = require('./middlewares/errorHandler.js')
 const logger = require('./utils/logger.js')
@@ -25,6 +27,19 @@ const app = express()
 const server = http.createServer(app)
 const io = socketIO(server)
 
+const options = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "e-commerce",
+      version: "1.0.0",
+      description: "Descripción del e-commerce "
+    },
+    apis: ["./docs/*.js"]
+  }
+}
+const spec = swaggerJsdoc(options)
+
 app.use((req, res, next) => {
   logger.http(`${req.method} - ${req.url}`)
   next()
@@ -42,6 +57,8 @@ app.use(session(
     store: connectMongo.create({mongoUrl: `mongodb+srv://chibosio:Mika&Silver@cluster0.3jin0k1.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0&dbName=ecommerce`})
   }
 ))
+
+app.use("/apidocs", swaggerUi.serve, swaggerUi.setup(spec))
 
 passportConfig()
 app.use(passport.initialize());
