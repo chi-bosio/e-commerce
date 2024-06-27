@@ -40,7 +40,6 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Product'
-
     post:
       security:
         - bearerAuth: []
@@ -86,7 +85,6 @@ paths:
                 $ref: '#/components/schemas/Product'
         '404':
           description: Producto no encontrado
-
     put:
       security:
         - bearerAuth: []
@@ -118,7 +116,6 @@ paths:
           description: Solo los administradores pueden actualizar productos
         '404':
           description: Producto no encontrado
-
     delete:
       security:
         - bearerAuth: []
