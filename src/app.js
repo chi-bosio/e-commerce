@@ -33,7 +33,7 @@ const options = {
     info: {
       title: "e-commerce",
       version: "1.0.0",
-      description: "Descripción del e-commerce "
+      description: "Documentación del e-commerce "
     },
     apis: ["./docs/*.js"]
   }
