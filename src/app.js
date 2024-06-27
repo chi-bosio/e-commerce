@@ -34,9 +34,9 @@ const options = {
       title: "e-commerce",
       version: "1.0.0",
       description: "Documentación del e-commerce "
-    },
-    apis: ["./docs/*.js"]
-  }
+    }
+  },
+  apis: ["./docs/*.yaml"]
 }
 const spec = swaggerJsdoc(options)
 
