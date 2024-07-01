@@ -36,7 +36,7 @@ const options = {
       description: "Documentación del e-commerce "
     }
   },
-  apis: ["./docs/*.yaml"]
+  apis: ["./src/docs/*.yaml"]
 }
 const spec = swaggerJsdoc(options)
 
@@ -58,8 +58,6 @@ app.use(session(
   }
 ))
 
-app.use("/apidocs", swaggerUi.serve, swaggerUi.setup(spec))
-
 passportConfig()
 app.use(passport.initialize());
 app.use(passport.session())
@@ -78,6 +76,7 @@ app.use('/', viewRouter)
 app.use('/api/products', productRouter)
 app.use('/api/carts', cartRouter)
 app.use('/api/sessions', sessionRouter)
+app.use("/apidocs", swaggerUi.serve, swaggerUi.setup(spec))
 
 handleRealTimeProductsSocket(io)
 

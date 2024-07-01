@@ -3,7 +3,7 @@ paths:
     get:
       summary: Obtiene todos los carritos
       tags:
-        - Carritos
+        - Cart
       description: Obtiene una lista de todos los carritos de compras
       responses:
         '200':
@@ -17,7 +17,7 @@ paths:
     post:
       summary: Crea un nuevo carrito
       tags:
-        - Carritos
+        - Cart
       description: Crea un nuevo carrito de compras
       resposes:
         '201':
@@ -31,7 +31,7 @@ paths:
     get:
       summary: Obtiene un carrito por ID
       tags:
-        - Carritos
+        - Cart
       description: Obtiene los detalles de un carrito específico por su ID
       parameters:
         - in: path
@@ -52,7 +52,7 @@ paths:
     delete:
       summary: Elimina un carrito por ID
       tags:
-        - Carritos
+        - Cart
       description: Elimina un carrito específico del sistema por su ID
       parameters:
         - in: path
@@ -71,7 +71,7 @@ paths:
     post:
       summary: Realiza la compra del carrito
       tags:
-        - Carritos
+        - Cart
       description: Realiza la compra del carrito especificado por su ID
       parameters:
         - in: path
@@ -90,7 +90,7 @@ paths:
     post:
       summary: Agrega un producto a un carrito
       tags:
-        - Carritos
+        - Cart
       description: Agrega un nuevo producto al carrito especificado por su ID
       parameters:
         - in: path
@@ -126,7 +126,7 @@ paths:
     put:
       summary: Actualiza la cantidad de un producto en el carrito
       tags:
-        - Carritos
+        - Cart
       description: Actualiza la cantidad de un producto específico en el carrito identificado por su ID
       parameters:
         - in: path
@@ -163,7 +163,7 @@ paths:
     delete:
       summary: Elimina un producto del carrito
       tags:
-        - Carritos
+        - Cart
       description: Elimina un producto específico del carrito identificado por su ID
       parameters:
         - in: path

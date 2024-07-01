@@ -3,7 +3,7 @@ paths:
     get:
       summary: Genera productos de prueba
       tags:
-        - Productos
+        - products
       description: Genera una lista de productos de prueba para testing
       responses:
         '200':
@@ -19,7 +19,7 @@ paths:
     get:
       summary: Prueba de logger
       tags:
-        - Productos
+        - Products
       description: Realiza una prueba del sistema de logging
       responses:
         '200':
@@ -29,7 +29,7 @@ paths:
     get:
       summary: Obtiene todos los productos
       tags:
-        - Productos
+        - Products
       description: Obtiene una lista de todos los productos disponibles
       responses:
         '200':
@@ -45,7 +45,7 @@ paths:
         - bearerAuth: []
       summary: Crea un nuevo producto
       tags:
-        - Productos
+        - Products
       description: Crea un nuevo producto en el sistema. Requiere autorización de administrador
       requestBody:
         required: true
@@ -67,7 +67,7 @@ paths:
     get:
       summary: Obtiene un producto por ID
       tags:
-        - Productos
+        - Products
       description: Obtiene los detalles de un producto específico por su ID
       parameters:
         - in: path
@@ -90,7 +90,7 @@ paths:
         - bearerAuth: []
       summary: Actualiza un producto por ID
       tags:
-        - Productos
+        - Products
       description: Actualiza los detalles de un producto específico. Requiere autorización de administrador
       parameters:
         - in: path
@@ -121,7 +121,7 @@ paths:
         - bearerAuth: []
       summary: Elimina un producto por ID
       tags:
-        - Productos
+        - Products
       description: Elimina un producto específico del sistema. Requiere autorización de administrador
       parameters:
         - in: path
