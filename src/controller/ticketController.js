@@ -4,7 +4,7 @@ class TicketController{
     static async getAllickets(req, res){
         try {
             const tickets = await TicketService.getAllTickets()
-            res.json(tickets)
+            res.status(200).json(tickets)
         } catch (error) {
             res.status(500).json({error: `Error al obtener los tickets: ${error.message}`})
         }
@@ -14,7 +14,7 @@ class TicketController{
         const ticketData = req.body
         try {
             const newTicket = await TicketService.createTicket(ticketData)
-            res.json(newTicket)
+            res.status(200).json(newTicket)
         } catch (error) {
             res.status(500).json({error: `Error al crear el ticket: $${error.message}`})
         }

@@ -6,7 +6,7 @@ class SessionController{
     static async getUsers(req, res){
         try {
             const users = await UserService.getUsers()
-            res.json(users)
+            res.status(200).json(users)
         } catch (error) {
             res.status(500).json({error: `Error al obtener los productos`})
         }
@@ -70,7 +70,7 @@ class SessionController{
             }
 
             const userDTO = new UserDTO(user)
-            res.json(userDTO)
+            res.status(200).json(userDTO)
         } catch (error) {
             res.status(500).json({error: error.message})
         }

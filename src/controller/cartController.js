@@ -8,7 +8,7 @@ class CartController{
     static async getAllCarts(req, res){
         try {
             const carts = await CartService.getAllCarts()
-            res.json(carts)
+            res.status(200).json(carts)
         } catch (error) {
             res.status(500).json({error: `Error al obtener los carritos: ${error.message}`})
         }
@@ -19,7 +19,7 @@ class CartController{
 
         try {
             const newCarts = await CartService.createCart(initialProducts)
-            res.json(newCarts)
+            res.status(200).json(newCarts)
         } catch (error) {
             res.status(500).json({error: `Error al crear el carrito: ${error.message}`})
         }
@@ -37,7 +37,7 @@ class CartController{
                     errorList.CART_NOT_FOUND.message
                 )
             }
-            res.json(cartDTO)
+            res.status(200).json(cartDTO)
         } catch (error) {
             next(error)
         }
@@ -48,7 +48,7 @@ class CartController{
 
         try {
             const addedProduct = await CartService.addProductToCart(cid, pid)
-            res.json(addedProduct)
+            res.status(200).json(addedProduct)
         } catch (error) {
             res.status(500).json({error: `Error al agregar el producto: ${error.message}`})
         }
@@ -59,7 +59,7 @@ class CartController{
 
         try {
             await CartService.removeProductFromCart(cid, pid)
-            res.json({message: 'El producto ha sido eliminado del carrito con éxito'})
+            res.status(200).json({message: 'El producto ha sido eliminado del carrito con éxito'})
         } catch (error) {
             res.status(500).json({error: `Error al eliminar el producto del carrito: ${error.message}`})
         }
@@ -71,7 +71,7 @@ class CartController{
 
         try {
             const updatedProduct = await CartService.updateProductQuantity(cid, pid, quantity)
-            res.json(updatedProduct)
+            res.status(200).json(updatedProduct)
         } catch (error) {
             res.status(500).json({error: `Error al actualizar la cantidad del producto: ${error.message}`})
         }
@@ -82,7 +82,7 @@ class CartController{
 
         try {
             await CartService.removeAllProductsFromCart(cid)
-            res.json({message: 'El carrito ha sido eliminado con éxito'})
+            res.status(200).json({message: 'El carrito ha sido eliminado con éxito'})
         } catch (error) {
             res.status(500).json({error: `Error al eliminar el carrito: ${error.message}`})
         }
@@ -125,7 +125,7 @@ class CartController{
             })
 
             await CartService.removeAllProductsFromCart(cid)
-            res.json({message: 'Compra realizada con éxito', ticket: newTicket})
+            res.status(200).json({message: 'Compra realizada con éxito', ticket: newTicket})
         } catch (error) {
             res.status(500).json({error: `Error al realizar la compra: ${error.message}`})
         }

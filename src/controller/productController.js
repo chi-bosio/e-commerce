@@ -16,7 +16,7 @@ class ProductController{
             }
 
             const products = await productModel.paginate({}, options)
-            res.json(products)
+            res.status(200).json(products)
         } catch (error) {
             res.status(500).json({error: `Error al obtener los productos: ${error.message}`})   
         }
@@ -33,7 +33,7 @@ class ProductController{
                     errorList.PRODUCT_NOT_FOUND.message
                 )
             }
-            res.json(product)
+            res.status(200).json(product)
         } catch (error) {
             next(error)   
         }
@@ -44,7 +44,7 @@ class ProductController{
             const productData = new ProductDTO(req.body)
 
             const newProduct = await ProductService.addProduct(productData)
-            res.json(newProduct)
+            res.status(200).json(newProduct)
         } catch (error) {
             res.status(500).json({error: `Error al crear el producto: ${error.message}`})   
         }
@@ -55,8 +55,8 @@ class ProductController{
         const updatedFields = req.body
 
         try {
-            const updatedProduct = await ProductService.updateProduct(pid. updatedFields)
-            res.json(updatedProduct)
+            const updatedProduct = await ProductService.updateProduct(pid, updatedFields)
+            res.status(200).json(updatedProduct)
         } catch (error) {
             res.status(500).json({error: `Error al actualizar el producto: ${error.message}`})   
         }
@@ -67,7 +67,7 @@ class ProductController{
 
         try {
             await ProductService.deleteProducts(pid)
-            res.json({message: 'Producto eliminado con éxito'})
+            res.status(200).json({message: 'Producto eliminado con éxito'})
         } catch (error) {
             res.status(500).json({error: `Error al eliminar el producto: ${error.message}`})   
         }
@@ -75,7 +75,7 @@ class ProductController{
 
     static async mockProducts(req, res){
         const mockProduct = generateMockProducts(100)
-        res.json(mockProduct)
+        res.status(200).json(mockProduct)
     }
 
     static async loggerTest(req, res){
