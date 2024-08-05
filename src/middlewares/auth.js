@@ -1,9 +1,28 @@
+const config = require('../config/config')
+
 const authenticate = (req, res, next) => {
-    if(req.session && req.session.user){
-        next()
-    } else{
-        res.status(401).json({error: 'No autorizado'})
+    if(!req.session.user){
+        return res.redirect(`http://localhost:${config.PORT}/`)
     }
+    next()
+};
+
+const admin = (req, res, next) => {
+    if (req.session.user.role !== 'admin') {
+        return res.redirect(`http://localhost:${config.PORT}/products`)
+    } 
+    next()
 }
 
-module.exports = authenticate
+const user = (req, res, next) => {
+    if (req.session.usuario.rol === 'admin') {
+        return res.redirect(`http://localhost:${config.PORT}/realTimeProducts`)
+    }
+    next()
+}
+
+module.exports = {
+    authenticate,
+    admin,
+    user
+}
