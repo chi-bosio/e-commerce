@@ -1,6 +1,6 @@
-const cartModel = require("../models/cartModel");
+const cartModel = require("./models/cartModel");
 
-class CartManager{
+class CartDAO{
 
     async createCart() {
         try {
@@ -13,10 +13,10 @@ class CartManager{
         }
     }
 
-    async getCartById(id) {
+    async getCartById(cid) {
         try {
 
-            let cart=await cartModel.findOne({_id:id}).populate("products.pid")
+            let cart=await cartModel.findById(cid)
             
             if (!cart) {
                 return null;
@@ -107,23 +107,17 @@ class CartManager{
         }
     }
 
-    async removeAllProducts(cid){
+    async emptyCarts(cid){
         try {
-            let carts = await cartModel.findById(cid);
-
-            if (!carts) {
+            let cart = await cartModel.findByIdAndUpdate(cid, {products: []}, {new: true})
+            if(!cart){
                 throw new Error('Carrito no encontrado')
             }
-
-            carts.products = []
-
-            await carts.save()
-
-            return carts
+            return cart
         } catch (error) {
-            throw new Error("Error al eliminar todos los productos del carrito: " + error.message);
-        } 
+            throw new Error("Error al vaciar el carrito desde Cart Dao: " + error.message)
+        }
     }
 }
 
-module.exports = CartManager;
+module.exports = CartDAO;

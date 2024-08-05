@@ -1,8 +1,8 @@
-const productModel = require("../models/productModel");
-const logger = require('../../utils/logger')
+const productModel = require("./models/productModel");
+const logger = require('../utils/logger')
 
 
-class ProductManager{
+class ProductDAO{
     constructor(){
         
     }
@@ -46,6 +46,18 @@ class ProductManager{
         }
     }
 
+    async getProductFiltered(category = null){
+        try {
+            let filter = {}
+            if(category){
+                filter.category = category
+            }
+            return await productModel.find(filter).lean()
+        } catch (error) {
+            return error
+        }
+    }
+
     async updateProduct(id, updatedFields) {
         try {
             let products = await productModel.findOneAndUpdate(
@@ -81,4 +93,4 @@ class ProductManager{
     }
 }
 
-module.exports = ProductManager
+module.exports = ProductDAO
