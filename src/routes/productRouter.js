@@ -1,5 +1,4 @@
 const ProductController = require('../controller/productController')
-const {isAdmin} = require('../middlewares/roleAuth')
 
 const Router=require('express').Router;
 const router=Router()
@@ -12,10 +11,10 @@ router.get('/', ProductController.getAllProducts);
   
 router.get('/:pid', ProductController.getProductById);
 
-router.post('/', isAdmin, ProductController.createProduct)
+router.post('/', ProductController.createProduct)
 
-router.put('/:pid', isAdmin, ProductController.updateProduct);
+router.put('/:pid', ProductController.updateProduct);
 
-router.delete('/:pid', isAdmin, ProductController.deleteProduct);
+router.delete('/:pid', ProductController.deleteProduct);
 
 module.exports = router

@@ -1,5 +1,5 @@
-const winston = require('winston')
-const config = require('../config/config')
+const {createLogger, transports, format, addColors} = require('winston')
+const config = require('./config')
 const path = require('path')
 
 const logLevels = {
@@ -21,62 +21,44 @@ const logLevels = {
     }
 }
 
-winston.addColors(logLevels.colors)
+addColors(logLevels.colors)
 
-const devLogger = winston.createLogger(
+const devLogger = createLogger(
     {
         levels: logLevels.levels,
         transports: [
-            new winston.transports.Console({
+            new transports.Console({
                 level: 'debug',
-                format: winston.format.combine(
-                    winston.format.colorize({colors: logLevels.colors}),
-                    winston.format.simple()
-                ),
-            }),
-            new winston.transports.File({
-                filename: path.join(__dirname, '../logs/errors.log'),
-                level: 'error',
                 format: format.combine(
-                    format.uncolorize(),
-                    format.timestamp(),
-                    format.json()
+                    format.colorize({colors: logLevels.colors}),
+                    format.simple()
                 )
             })
         ]
     }
 )
 
-const prodLogger = winston.createLogger(
+const prodLogger = createLogger(
     {
         levels: logLevels.levels,
         transports: [
-            new winston.transports.Console({
+            new transports.Console({
                 level: 'info',
-                format: winston.format.combine(
-                    winston.format.colorize({colors: logLevels.colors}),
-                    winston.format.simple()
+                format: format.combine(
+                    format.colorize({colors: logLevels.colors}),
+                    format.simple()
                 )
             }),
-            new winston.transports.File({
+            new transports.File({
                 filename: path.join(__dirname, '../logs/errors.log'),
-                level: 'error',
-                format: winston.format.combine(
-                    winston.format.timestamp(),
-                    winston.format.prettyPrint()
+                level: 'fatal',
+                format: format.combine(
+                    format.timestamp(),
+                    format.prettyPrint()
                 )
             })
         ]
     }
 )
 
-const logger = (req, res, next) => {
-    if(config.mode === 'prod'){
-        req.logger = prodLogger
-    } else{
-        req.logger = devLogger
-    }
-    next()
-}
-
-module.exports = logger
+module.exports = config.mode === 'prod' ? prodLogger : devLogger

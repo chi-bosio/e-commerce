@@ -1,5 +1,5 @@
 const ViewsController = require('../controller/viewsController')
-const logger = require('../utils/logger')
+const logger = require('../config/logger')
 
 const Router = require('express').Router;
 const router = Router();

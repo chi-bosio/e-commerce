@@ -30,4 +30,4 @@ class ProductRepository{
     }
 }
 
-module.exports = new ProductRepository
+module.exports = ProductRepository

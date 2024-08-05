@@ -1,11 +1,8 @@
-const ProductManager = require('../dao/managers/productManager')
-const UserManager = require('../dao/managers/userManager')
+const ProductDAO = require('../dao/productDao')
+const UserDAO = require('../dao/userDao')
 const productModel = require('../dao/models/productModel')
 const cartModel = require('../dao/models/cartModel')
-const logger = require('../utils/logger')
-
-let um = new UserManager()
-let pm = new ProductManager()
+const logger = require('../config/logger')
 
 class ViewsController{
     static async getHome(req, res){
@@ -30,7 +27,7 @@ class ViewsController{
         let welcomeMessage = ''
         if(req.session.user){
             try {
-                const user = await um.getUserByFilter({username: req.session.user.username})
+                const user = await UserDAO.getUserByFilter({username: req.session.user.username})
                 if(user.role === 'admin'){
                     welcomeMessage = `Bienvenido ${user.username}. Eres un administrador`
                 } else{
@@ -108,7 +105,7 @@ class ViewsController{
     }
 
     static async getRealTimeProducts(req, res){
-        const products = await pm.getProduct()
+        const products = await ProductDAO.getProduct()
         res.render('realtimeproducts', {products})
     }
 }

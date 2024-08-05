@@ -1,6 +1,5 @@
 const ProductDAO = require('../dao/productDao')
 const {devLogger} = require('../config/logger')
-const __dirname = require('../utils/utils')
 
 const productDAO = new ProductDAO(__dirname + '/data/products.json')
 

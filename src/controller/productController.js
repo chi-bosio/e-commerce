@@ -1,10 +1,10 @@
 const productModel = require('../dao/models/productModel')
-const ProductService = require('../services/productService')
-const ProductDTO = require('../dto/productDTO')
-const generateMockProducts = require('../utils/mocking')
-const CustomError = require('../errors/customError')
-const errorList = require('../utils/errorList')
-const logger = require('../utils/logger')
+const ProductRepository = require('../services/repository/productRepository')
+const ProductDTO = require('../services/dto/productDTO')
+const generateMockProducts = require('../mocks/mocking')
+const CustomError = require('../services/errors/customError')
+const errorList = require('../services/errors/errorList')
+const logger = require('../config/logger')
 
 class ProductController{
     static async getAllProducts(req, res){
@@ -25,7 +25,7 @@ class ProductController{
     static async getProductById(req, res, next){
         const {pid} = req.params
         try {
-            const product = await ProductService.getProductById(pid)
+            const product = await ProductRepository.getProductById(pid)
             if(!product){
                 throw new CustomError(
                     errorList.PRODUCT_NOT_FOUND.status,
@@ -43,7 +43,7 @@ class ProductController{
         try {
             const productData = new ProductDTO(req.body)
 
-            const newProduct = await ProductService.addProduct(productData)
+            const newProduct = await ProductRepository.addProduct(productData)
             res.status(200).json(newProduct)
         } catch (error) {
             res.status(500).json({error: `Error al crear el producto: ${error.message}`})   
@@ -55,7 +55,7 @@ class ProductController{
         const updatedFields = req.body
 
         try {
-            const updatedProduct = await ProductService.updateProduct(pid, updatedFields)
+            const updatedProduct = await ProductRepository.updateProduct(pid, updatedFields)
             res.status(200).json(updatedProduct)
         } catch (error) {
             res.status(500).json({error: `Error al actualizar el producto: ${error.message}`})   
@@ -66,7 +66,7 @@ class ProductController{
         const {pid} = req.params
 
         try {
-            await ProductService.deleteProducts(pid)
+            await ProductRepository.deleteProducts(pid)
             res.status(200).json({message: 'Producto eliminado con éxito'})
         } catch (error) {
             res.status(500).json({error: `Error al eliminar el producto: ${error.message}`})   

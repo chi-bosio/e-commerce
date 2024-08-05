@@ -1,8 +1,5 @@
-const path = require('path')
 const multer = require('multer')
 const bcrypt = require('bcrypt')
-
-const __dirname = path.resolve()
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -40,7 +37,6 @@ const upload = multer({
 ])
 
 module.exports = {
-    __dirname,
     upload,
     createHash,
     validatePass

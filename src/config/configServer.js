@@ -1,14 +1,14 @@
 const mongoose = require('mongoose')
 const config = require('./config')
-const {devLogger} = require('../utils/logger')
+const logger = require('../config/logger')
 
 const URI = config.MONGO_URL
 const connToDB = () => {
     try {
         mongoose.connect(URI)
-        devLogger.info('Conectando a la DB ecommerce')
+        logger.info('Conectando a la DB ecommerce')
     } catch (error) {
-        devLogger.error(error)
+        logger.error(error)
     }
 }
 

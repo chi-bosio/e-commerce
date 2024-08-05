@@ -1,11 +1,11 @@
-const UserService = require('../services/userService')
-const UserDTO = require('../dto/userDTO')
-const logger = require('../utils/logger')
+const UserRepository = require('../services/repository/userRepository')
+const UserDTO = require('../services/dto/userDTO')
+const logger = require('../config/logger')
 
 class SessionController{
     static async getUsers(req, res){
         try {
-            const users = await UserService.getUsers()
+            const users = await UserRepository.getUsers()
             res.status(200).json(users)
         } catch (error) {
             res.status(500).json({error: `Error al obtener los productos`})
@@ -64,7 +64,7 @@ class SessionController{
     static async currentUser(req, res){
         try {
             const userId = req.session.user._id
-            const user = await UserService.getUserByFilter({_id: userId})
+            const user = await UserRepository.getUserByFilter({_id: userId})
             if(!user){
                 throw new Error('Usuario no encontrado')
             }

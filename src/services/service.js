@@ -5,7 +5,7 @@ const productDAO = new ProductDAO()
 const productRepository = new ProductRepository(productDAO)
 
 
-const UserDAO = require('../dao/userDAO.js')
+const UserDAO = require('../dao/userDao.js')
 const UserRepository = require('./repository/userRepository.js')
 
 const userDAO = new UserDAO()

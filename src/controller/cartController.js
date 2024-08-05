@@ -1,27 +1,25 @@
-const CartService = require('../services/cartService')
-const ProductService = require('../services/productService')
-const TicketService = require('../services/ticketService')
-const CustomError = require('../errors/customError')
-const errorList = require('../utils/errorList')
+const CartRepository = require('../services/repository/cartRepository')
+const ProductRepository = require('../services/repository/productRepository')
+const cartModel = require('../dao/models/cartModel')
+const CustomError = require('../services/errors/customError')
+const errorList = require('../services/errors/errorList')
 
 class CartController{
-    static async getAllCarts(req, res){
+    static async getCarts(req, res){
         try {
-            const carts = await CartService.getAllCarts()
-            res.status(200).json(carts)
+            res.json({carts: await CartRepository.getCarts()})
         } catch (error) {
             res.status(500).json({error: `Error al obtener los carritos: ${error.message}`})
         }
     }
 
     static async createCart(req, res){
-        const initialProducts = req.body.products || []
-
         try {
-            const newCarts = await CartService.createCart(initialProducts)
-            res.status(200).json(newCarts)
+            const newCarts = await CartRepository.createCart()
+            res.json(newCarts)
         } catch (error) {
-            res.status(500).json({error: `Error al crear el carrito: ${error.message}`})
+            req.logger.error(`Error al crear el carrito: ${error.message}`)
+            res.status(500).json({error: 'Error interno'})
         }
     }
 
@@ -29,28 +27,43 @@ class CartController{
         const {cid} = req.params
 
         try {
-            const cartDTO = await CartService.getCartById(cid)
-            if(!cartDTO){
+            const cart = await cartModel.findOne(cid)
+            if(!cart){
                 throw new CustomError(
-                    errorList.CART_NOT_FOUND.status, 
-                    errorList.CART_NOT_FOUND.code, 
-                    errorList.CART_NOT_FOUND.message
+                    errorList.CART_NOT_FOUND, {cid}
                 )
             }
-            res.status(200).json(cartDTO)
+
+            const productsInCart = cart.products.map(i => ({
+                product: i.product.toObject(),
+                quantity: i.quantity
+            }))
+
+            res.json(cart)
         } catch (error) {
             next(error)
         }
     }
 
-    static async addProductToCart(req, res){
+    static async addProductToCart(req, res, next){
         const {cid, pid} = req.params
 
         try {
-            const addedProduct = await CartService.addProductToCart(cid, pid)
-            res.status(200).json(addedProduct)
+            const addedProduct = await ProductRepository.getProductById(pid)
+            let quantity = req.body.quantity || 1
+
+            if(!addedProduct){
+                throw new CustomError(
+                    errorList.PRODUCT_NOT_FOUND, {pid}
+                )
+            }
+
+            const updateCart = await CartRepository.addProductToCart(cid, pid, quantity)
+            const totalQuantity = updateCart.products.reduce((acc, i) => acc + i.quantity, 0)
+
+            res.json({products: updateCart.products, totalQuantity})
         } catch (error) {
-            res.status(500).json({error: `Error al agregar el producto: ${error.message}`})
+            next(error)
         }
     }
 
@@ -58,10 +71,31 @@ class CartController{
         const {cid, pid} = req.params
 
         try {
-            await CartService.removeProductFromCart(cid, pid)
-            res.status(200).json({message: 'El producto ha sido eliminado del carrito con éxito'})
+            const updatedCart = await CartRepository.removeProductFromCart(cid, pid)
+            res.json({
+                status: 'success',
+                message: 'El producto ha sido eliminado del carrito con éxito',
+                updateCart
+            })
         } catch (error) {
-            res.status(500).json({error: `Error al eliminar el producto del carrito: ${error.message}`})
+            req.logger.error(`Error al eliminar el producto del carrito: ${error.message}`)
+            res.status(500).json({status: 'error', error: 'Error interno'})
+        }
+    }
+
+    static async updateCart(req, res){
+        const {cid} = req.params
+        const updatedProduct = req.body
+        
+        try {
+            let updatedCart = await CartRepository.updateCart(cid, updatedProduct)
+            res.json(updatedCart)
+        } catch (error) {
+            req.logger.error(`Error al actualizar el carrito: ${error.message}`)
+            res.status(500).json({
+                status: 'error',
+                error: 'Error interno'
+            })
         }
     }
 
@@ -70,64 +104,37 @@ class CartController{
         const {quantity} = req.body
 
         try {
-            const updatedProduct = await CartService.updateProductQuantity(cid, pid, quantity)
-            res.status(200).json(updatedProduct)
-        } catch (error) {
-            res.status(500).json({error: `Error al actualizar la cantidad del producto: ${error.message}`})
-        }
-    }
-
-    static async removeAllProductsFromCart(req, res){
-        const {cid} = req.params
-
-        try {
-            await CartService.removeAllProductsFromCart(cid)
-            res.status(200).json({message: 'El carrito ha sido eliminado con éxito'})
-        } catch (error) {
-            res.status(500).json({error: `Error al eliminar el carrito: ${error.message}`})
-        }
-    }
-
-    static async purchaseCart(req, res){
-        const {cid} = req.params
-        const userEmail = req.session.user.email
-
-        try {
-            const cart = await CartService.getCartById(cid)
-            if(!cart){
-                return res.status(404).json({error: 'Carrito no encontrado'})
-            }
-
-            let totalAmount = 0
-            const purchaseProducts = []
-
-            for(const item of cart.products){
-                const product = await ProductService.getProductById(item.pid)
-
-                if(product.stock >= item.quantity){
-                    product.stock -= item.quantity;
-                    await ProductService.updateProduct(product._id, {stock: product.stock});
-                    totalAmount += product.price * item.quantity;
-
-                    purchaseProducts.push({
-                        pid: product._id,
-                        quantity: item.quantity,
-                        price: product.price
-                    });
-                } else{
-                    res.status(400).json({error: `No hay suficiente stock para el producto ${product.name}`})
-                }
-            }
-
-            const newTicket = await TicketService.createTicket({
-                amount: totalAmount,
-                purchaser: userEmail
+            const updatedCart = await CartRepository.updateProductQuantity(cid, pid, quantity)
+            res.json({
+                status: 'success',
+                message: 'Cantidad del producto actualizada con éxito',
+                updatedCart
             })
-
-            await CartService.removeAllProductsFromCart(cid)
-            res.status(200).json({message: 'Compra realizada con éxito', ticket: newTicket})
         } catch (error) {
-            res.status(500).json({error: `Error al realizar la compra: ${error.message}`})
+            req.logger.error(`Error al actualizar la cantidad de productos en el carrito: ${error.message}`)
+            res.status(500).json({
+                status: 'error',
+                error: 'Error interno'
+            })
+        }
+    }
+
+    static async emptyCart(req, res){
+        const {cid} = req.params
+
+        try {
+            const updatedCart = await CartRepository.emptyCart(cid)
+            
+            res.json({
+                status: 'success',
+                message: 'Productos eliminado del carrito con éxito'
+            })
+        } catch (error) {
+            req.logger.error(`Error al vaciar el carrito: ${error.message}`)
+            res.status(500).json({
+                status: 'error',
+                error: 'Error interno'
+            })
         }
     }
 }

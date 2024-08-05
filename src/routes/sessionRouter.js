@@ -9,8 +9,6 @@ const router = Router()
 
 router.get('/', SessionController.getUsers)
 
-router.get('/current', authenticate, SessionController.currentUser)
-
 router.get('/registerError', SessionController.registerError)
 
 router.post(
