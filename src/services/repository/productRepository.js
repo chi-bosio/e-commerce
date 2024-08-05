@@ -1,6 +1,6 @@
-const {ProductDAO} = require('../dao/managers/factory')
+const ProductDAO = require('../../dao/productDao')
 
-class ProductService{
+class ProductRepository{
     constructor(){
         this.productDAO = new ProductDAO()
     }
@@ -24,6 +24,10 @@ class ProductService{
     async deleteProducts(id){
         return await this.productDAO.deleteProducts(id)
     }
+
+    async getProductFiltered(category = null){
+        return await this.productDAO.getProductFiltered(category)
+    }
 }
 
-module.exports = new ProductService()
+module.exports = new ProductRepository
