@@ -1,52 +1,88 @@
 const productModel = require('../dao/models/productModel')
+const userModel = require('../dao/models/userModel')
 const ProductRepository = require('../services/repository/productRepository')
-const ProductDTO = require('../services/dto/productDTO')
-const generateMockProducts = require('../mocks/mocking')
-const CustomError = require('../services/errors/customError')
-const errorList = require('../services/errors/errorList')
-const logger = require('../config/logger')
+const routes = require('../utils/utils')
+const sendEmail = require('../config/sendEmail')
 
-class ProductController{
+const routeProducts =  routes.products
+
+class ProductController{    
     static async getAllProducts(req, res){
-        try {
-            const {page = 1, limit = 10} = req.query
-            const options = {
-                page: parseInt(page),
-                limit: parseInt(limit)
-            }
+        const {page = 1, limit = 10, query, sort} = req.query
+            
+        let filter = {}
+        if(query && query !== ''){
+            filter = {category: query}
+        }
 
-            const products = await productModel.paginate({}, options)
-            res.status(200).json(products)
+        switch(sort){
+            case 'asc':
+                sort = {'price': 1}
+                break
+            case 'desc':
+                sort = {'price': -1}
+                break
+            default:
+                sort = undefined
+                break
+        }
+
+        try {
+            let{
+                docs: products,
+                tPages,
+                prevPage,
+                nextPage,
+                page,
+                hasPrevPage,
+                hasNextPage
+            } = await productModel.paginate(filter, {limit: limit, page: page, sort: sort, lean: true})
+
+            res.status(200).json({
+                status: "success",
+                payload: products,
+                tPages: tPages,
+                prevPage: prevPage,
+                nextPage: nextPage,
+                page: page,
+                hasPrevPage: hasPrevPage,
+                hasNextPage: hasNextPage,
+                prevLink: page > 1 ? `/?page=${page - 1}` : null,
+                nextLink: page < tPages ? `/?page=${page + 1}` : null
+            })
         } catch (error) {
-            res.status(500).json({error: `Error al obtener los productos: ${error.message}`})   
+            req.logger.error(error)
+            res.status(500).send('Error interno')   
         }
     }
 
-    static async getProductById(req, res, next){
+    static async getProductById(req, res){
         const {pid} = req.params
         try {
             const product = await ProductRepository.getProductById(pid)
-            if(!product){
-                throw new CustomError(
-                    errorList.PRODUCT_NOT_FOUND.status,
-                    errorList.PRODUCT_NOT_FOUND.code,
-                    errorList.PRODUCT_NOT_FOUND.message
-                )
-            }
-            res.status(200).json(product)
+            res.json({product})
         } catch (error) {
-            next(error)   
+            req.logger.error(error)
+            res.status(404).json({error: error.message})  
         }
     }
 
-    static async createProduct(req, res){
+    static async addProduct(req, res){
         try {
-            const productData = new ProductDTO(req.body)
+            const productData = req.body
+            const email = req?.user?.email || productData.email
+            let user = await userModel.findOne({email: email})
+            let owner = user.email
 
-            const newProduct = await ProductRepository.addProduct(productData)
-            res.status(200).json(newProduct)
+            if(user.role === 'premium'){
+                productData.owner = owner
+            }
+
+            await ProductRepository.addProduct(productData)
+            res.status(201).json({message: 'Producto creado'})
         } catch (error) {
-            res.status(500).json({error: `Error al crear el producto: ${error.message}`})   
+            req.logger.error(error)
+            res.status(400).json({error: error.message}) 
         }
     }
 
@@ -55,10 +91,11 @@ class ProductController{
         const updatedFields = req.body
 
         try {
-            const updatedProduct = await ProductRepository.updateProduct(pid, updatedFields)
-            res.status(200).json(updatedProduct)
+            await ProductRepository.updateProduct(pid, updatedFields)
+            res.json({message: 'Producto actualizado con éxito'})
         } catch (error) {
-            res.status(500).json({error: `Error al actualizar el producto: ${error.message}`})   
+            req.logger.error(error)
+            res.status(500).json({error: error.message})   
         }
     }
 
@@ -66,31 +103,27 @@ class ProductController{
         const {pid} = req.params
 
         try {
-            await ProductRepository.deleteProducts(pid)
-            res.status(200).json({message: 'Producto eliminado con éxito'})
+            const product = await ProductRepository.getProductById(pid)
+            if(!product){
+                return res.status(404).json({error: 'No se encontró al propietario del producto'})
+            }
+
+            if(owner.role === 'premium'){
+                const subject = 'Producto eliminado'
+                const msg = `
+                <p>Estimado ${owner.first__name},</p>
+                <p>Le informamos que su producto <strong>${product.title}</strong> ha sido eliminado de nuestra plataforma.</p>
+                <p>Saludos,</p>
+                <p>El equipo de E-commerce</p>
+                `
+                await sendEmail(owner.email, subject, msg)
+            }
+
+            await ProductRepository.deleteProduct(pid)
+            res.json({message: 'Producto eliminado con éxito'})
         } catch (error) {
-            res.status(500).json({error: `Error al eliminar el producto: ${error.message}`})   
-        }
-    }
-
-    static async mockProducts(req, res){
-        const mockProduct = generateMockProducts(100)
-        res.status(200).json(mockProduct)
-    }
-
-    static async loggerTest(req, res){
-        try{
-            logger.debug('Debug message')
-            logger.info('Info message')
-            logger.warning('Warning message')
-            logger.error('Errer message')
-            logger.fatal('Fatal message')
-            logger.http('HTTP message')
-
-            res.status(200).json({message: 'Mensajes de registro enviados con éxito'})
-        } catch(error){
-            logger.error(`Error in loggerTest: ${error}`)
-            res.status(500).json({error: 'Error al generar los registros'})
+            req.logger.error(error)
+            res.status(500).json({error: error.message})   
         }
     }
 }

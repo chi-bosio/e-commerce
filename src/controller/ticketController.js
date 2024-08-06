@@ -1,22 +1,30 @@
-const TicketService = require('../services/ticketService')
+const TicketRepository = require('../services/repository/ticketRepository')
+const sendEmail = require('../config/sendEmail')
 
 class TicketController{
-    static async getAllickets(req, res){
-        try {
-            const tickets = await TicketService.getAllTickets()
-            res.status(200).json(tickets)
-        } catch (error) {
-            res.status(500).json({error: `Error al obtener los tickets: ${error.message}`})
-        }
-    }
+    static async purchase(req, res){
+        const {uid} = req.user
+        const cid = req.session.user.cart.toString()
 
-    static async createTicket(req, res){
-        const ticketData = req.body
         try {
-            const newTicket = await TicketService.createTicket(ticketData)
-            res.status(200).json(newTicket)
+            const ticket = await TicketRepository.createTicket(uid, cid)
+            req.logger.info('Ticket creado con éxito')
+
+            const userEmail = req.user.email
+            const latestTicket = await TicketRepository.getLatestTicketByUser(uid)
+            await sendEmail(
+                userEmail, 
+                `Su compra ha sido completada. ID del ticket: ${latestTicket.code}`,
+                    `<h1>Gracias por realizar su compra</h1>
+                <p>Por favor no pierda su ID de compra para realizar reclamos:</p> 
+                <h2>${latestTicket.code}</h2>
+                <p>Precio: ${latestTicket.amount}</p>
+                `
+            )
+            res.status(201).json(ticket)
         } catch (error) {
-            res.status(500).json({error: `Error al crear el ticket: $${error.message}`})
+            req.logger.error('Error al crear el ticket')
+            res.statut(500).json({error: 'Error interno'})
         }
     }
 }
