@@ -18,3 +18,5 @@ const loggers = async (req, res) => {
         });
     }
 };
+
+module.exports = loggers

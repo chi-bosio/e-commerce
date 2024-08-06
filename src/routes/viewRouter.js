@@ -1,31 +1,42 @@
 const ViewsController = require('../controller/viewsController')
-const logger = require('../config/logger')
+const {auth, admin, users} = require('../middlewares/auth')
 
 const Router = require('express').Router;
 const router = Router();
 
-function handleRealTimeProductsSocket(io) {
-    io.on('connection', async(socket) => {
-        logger.info('Usuario conectado a la ruta /realtimeproducts');
-        const products = await ViewsController.getProducts;
-        socket.emit('products', products);
-    });
-}
+router.get('/products', auth, users, ViewsController.getProducts)
 
-router.get("/", ViewsController.getHome);
+router.get('/carts', auth, ViewsController.getCarts)
 
-router.get('/products', ViewsController.getProducts)
+router.get('/cart', auth, ViewsController.getCart)
 
-router.get('/products/:pid', ViewsController.getProductById)
+router.get('/products/:pid', auth, ViewsController.getProductById)
 
-router.get('/cart/:cid', ViewsController.getCartById)
+router.get('/cart/:cid', auth, admin, ViewsController.getCartById)
 
-router.get('/login', ViewsController.getLogin)
+router.get('/', ViewsController.getLogin)
 
 router.get('/register', ViewsController.getRegister)
 
-router.get('/profile', ViewsController.getProfile)
+router.get('/realtimeproducts', auth, admin, ViewsController.getRealTimeProducts)
 
-router.get('/realtimeproducts', ViewsController.getRealTimeProducts)
+router.get("/chat", users, ViewsController.chat)
 
-module.exports = {router, handleRealTimeProductsSocket}
+router.get('/user', auth, ViewsController.user)
+
+router.get('/mocking', ViewsController.mock)
+
+router.get("/forgotpass", ViewsController.forgotPassword)
+
+router.get("/resetpass", ViewsController.resetPassword)
+
+router.get("/role", ViewsController.role)
+
+router.get("/premium", ViewsController.premium)
+
+router.get("/adminusers", auth, admin, ViewsController.getAdminUsers)
+
+router.get("/details", auth, ViewsController.details)
+
+
+module.exports = router

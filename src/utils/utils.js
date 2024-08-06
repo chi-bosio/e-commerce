@@ -1,24 +1,22 @@
 const multer = require('multer')
 const bcrypt = require('bcrypt')
+const {join} = require('path')
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         let folderName = ''
-        switch (file.fieldName){
-            case 'profiles': 
-                folderName = 'profiles'
-            case 'products':
-                folderName = 'products'
-            case 'documents':
-                folderName = 'documents'
-            default:
-                folderName = 'others'
+        if (file.fieldname === 'profileImage') {
+            uploadPath = `${__dirname}/uploads/profiles/`;
+        } else if (file.fieldname === 'productImage') {
+            uploadPath = `${__dirname}/uploads/products/`;
+        } else {
+            uploadPath = `${__dirname}/uploads/documents/`;
         }
-        cb(null, file.originalName)
+        cb(null, folderName)
     },
 
     filename: function(req, file, cb){
-        cb(null, file.originalName)
+        cb(null, `${Date.now()}-${file.originalname}`)
     }
 })
 
@@ -36,8 +34,14 @@ const upload = multer({
     {name: 'comprobantAccountStatus', maxCount: 1}
 ])
 
+const routes = {
+    products: join(__dirname, '../data/products.json'),
+    carts: join(__dirname, '../data/carts.json')
+}
+
 module.exports = {
     upload,
     createHash,
-    validatePass
+    validatePass,
+    routes
 }

@@ -117,7 +117,7 @@ class SessionController{
             const subject = 'Recuperar contraseña'
             const message = `<h1>Recupere su contraseña</h1>
             <p>Haga click en este enlace para recuperar su contraseña:</p> 
-            <a href="http://localhost:${config.PORT}/resetpassword?token=${token}">Recuperar contraseña</a>`
+            <a href="http://localhost:${config.PORT}/resetpass?token=${token}">Recuperar contraseña</a>`
     
             await sendEmail(user.email, subject, message)
             res.status(200).json({message: 'Se envió un correo electrónico para recuperar su contraseña' })
