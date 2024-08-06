@@ -21,7 +21,8 @@ const storage = multer.diskStorage({
 })
 
 const createHash = pass => bcrypt.hashSync(pass, bcrypt.genSaltSync(10))
-const validatePass = (user, pass) => bcrypt.compareSync(pass, user.pass)
+
+const validatePass = (user, pass) => bcrypt.compareSync(pass, user.password)
 
 const upload = multer({
     storage,

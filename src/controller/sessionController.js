@@ -1,4 +1,5 @@
 const UserRepository = require('../services/repository/userRepository')
+const userRepository = new UserRepository()
 const UserDTO = require('../services/dto/userDTO')
 const logger = require('../config/logger')
 const {createHash, validatePass} = require('../utils/utils')
@@ -23,7 +24,7 @@ class SessionController{
             res.setHeader('Content-Type', 'application/json')
             res.redirect(`http://localhost:${config.PORT}/`)
         } catch (error) {
-            req.logger.error(error)
+            req.logger.error(`Error al realizar el registro: ${error.message}`)
             return res.status(400).json({error: 'Error inesperado'})
         }
     }
@@ -40,7 +41,7 @@ class SessionController{
             return res.status(400).json({ error: 'Faltan datos' })
         }
 
-        let user = await UserRepository.getUserBy({email})
+        let user = await userRepository.getUserBy({email})
         if(!user){
             res.setHeader('Content-Type', 'application/json');
             return res.status(401).json({ error: `Credenciales incorrectas` })
@@ -55,10 +56,10 @@ class SessionController{
         user = {...user}
         delete user.password
         req.session.user = user
-        UserRepository.updateLastConnection(user._id)
+        userRepository.updateLastConnection(user._id)
 
         res.setHeader('Content-Type', 'application/json')
-        res.status(200).json({message: "Login correcto", user})
+        res.status(200).redirect('/')
     }
 
     static async githubError(req, res){
@@ -78,7 +79,7 @@ class SessionController{
     }
 
     static async logout(req, res){
-        UserRepository.updateLastConnection(req.session.user._id)
+        userRepository.updateLastConnection(req.session.user._id)
         req.session.destroy(err => {
             if(err){
                 res.setHeader('Content-Type', 'application/json');

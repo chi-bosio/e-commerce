@@ -32,7 +32,7 @@ class ProductDAO{
             const products = await productModel.find().limit(limit);
             return products;
         } catch (error) {
-            throw new Error("Error al obtener los productos");
+            throw new Error("Error al obtener los productos 3");
         }
     }
 

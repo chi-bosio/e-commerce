@@ -1,7 +1,7 @@
 const passport = require('passport')
 const github = require('passport-github2')
 const local = require('passport-local')
-const {createHash, validatePassword} = require('../utils/utils')
+const {createHash, validatePass} = require('../utils/utils')
 const config = require('./config')
 const {userRepository, cartRepository} = require('../services/service')
 
@@ -87,7 +87,7 @@ const passportConfig = () => {
                         return done(null, false, {message:`Credenciales incorrectas`})
                     }
 
-                    if(!validaPassword(user, password)){
+                    if(!validatePass(user, password)){
                         return done(null, false)
                     }
 

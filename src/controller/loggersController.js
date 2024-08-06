@@ -19,4 +19,4 @@ const loggers = async (req, res) => {
     }
 };
 
-module.exports = loggers
+module.exports = {loggers}

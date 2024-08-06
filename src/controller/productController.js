@@ -8,8 +8,8 @@ const routeProducts =  routes.products
 
 class ProductController{    
     static async getAllProducts(req, res){
-        const {page = 1, limit = 10, query, sort} = req.query
-            
+        let {page = 1, limit = 10, query, sort} = req.query
+
         let filter = {}
         if(query && query !== ''){
             filter = {category: query}
@@ -51,7 +51,7 @@ class ProductController{
                 nextLink: page < tPages ? `/?page=${page + 1}` : null
             })
         } catch (error) {
-            req.logger.error(error)
+            req.logger.error(`Error al obtener los productos 1: ${error.message}`)
             res.status(500).send('Error interno')   
         }
     }
@@ -62,7 +62,7 @@ class ProductController{
             const product = await ProductRepository.getProductById(pid)
             res.json({product})
         } catch (error) {
-            req.logger.error(error)
+            req.logger.error(`Error al obtener el producto con ID ${pid}: ${error.message}`)
             res.status(404).json({error: error.message})  
         }
     }
@@ -81,7 +81,7 @@ class ProductController{
             await ProductRepository.addProduct(productData)
             res.status(201).json({message: 'Producto creado'})
         } catch (error) {
-            req.logger.error(error)
+            req.logger.error(`Error al crear el producto: ${error.message}`)
             res.status(400).json({error: error.message}) 
         }
     }
@@ -94,7 +94,7 @@ class ProductController{
             await ProductRepository.updateProduct(pid, updatedFields)
             res.json({message: 'Producto actualizado con éxito'})
         } catch (error) {
-            req.logger.error(error)
+            req.logger.error(`Error al actualizar el producto con ID ${pid}: ${error.message}`)
             res.status(500).json({error: error.message})   
         }
     }
@@ -122,7 +122,7 @@ class ProductController{
             await ProductRepository.deleteProduct(pid)
             res.json({message: 'Producto eliminado con éxito'})
         } catch (error) {
-            req.logger.error(error)
+            req.logger.error(`Error al eliminar el producto con ID ${pid}: ${error.message}`)
             res.status(500).json({error: error.message})   
         }
     }

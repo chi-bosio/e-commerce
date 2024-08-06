@@ -11,7 +11,7 @@ const swaggerUi = require('swagger-ui-express')
 
 const productRouter = require('./routes/productRouter.js')
 const cartRouter = require('./routes/cartRouter.js')
-const {router, handleRealTimeProductsSocket} = require('./routes/viewRouter.js')
+const viewRouter = require('./routes/viewRouter.js')
 const sessionRouter = require('./routes/sessionRouter.js')
 const userRouter = require('./routes/userRouter.js')
 const loggerRouter = require('./routes/loggerRouter.js')
@@ -22,8 +22,6 @@ const config = require('./config/config.js')
 const connToDB = require('./config/configServer.js')
 const socketProducts = require('./listeners/socketProducts.js')
 const socketChat = require('./listeners/socketChat.js')
-
-const viewRouter = router
 
 const PORT = config.PORT
 const app = express()
@@ -61,8 +59,8 @@ app.use('/', viewRouter)
 app.use('/api/products', productRouter)
 app.use('/api/carts', cartRouter)
 app.use('/api/sessions', sessionRouter)
-// app.use('/api/users', userRouter)
-// app.use('/loggerTest', loggerRouter)
+app.use('/api/users', userRouter)
+app.use('/loggerTest', loggerRouter)
 
 const options = {
   definition: {

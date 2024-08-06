@@ -2,11 +2,11 @@ const userModel = require('./models/userModel')
 const {sendEmail} = require('../config/sendEmail')
 
 class UserDao{
-    async getById(filter){
+    async getUserBy(filter){
         return await userModel.findOne(filter).lean()
     }
 
-    async create(user){
+    async createUser(user){
         return await userModel.create(user)
     }
 

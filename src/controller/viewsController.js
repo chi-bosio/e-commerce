@@ -5,95 +5,97 @@ const {ProductRepository, TicketRepository} = require('../services/service')
 const {generateMockProducts} = require('../mocks/mocking')
 const customError = require('../services/errors/customError')
 const errorList = require('../services/errors/errorList')
+const UserDAO = require('../dao/userDao')
+const userDAO = new UserDAO()
 
 class ViewsController{
+    static async getHome(req, res){
+        res.render('home')
+    }
+
     static async getProducts(req, res){
-        let {page, limit, query, sort} = req.query
-        let dataUser = req.session.user._id
-        let user = await userModel.findById(dataUser)
-
-        const isAdmin = user.role === 'admin'
-        const isUser = user.role === 'user'
-        const isPremium = user.role === 'premium'
-        const username = user.username
-        const userCart = req.session.user.cart
-        const email = user.email
-
-        const cartUser = await cartModel
-                                .findById(userCart)
-                                .populate(
-                                        'products.product',
-                                        '_id title price description category code stock thumbnail'
-                                )
-                                .lean()
-        const totalQuantity = cartUser.products.reduce((acc, i) => acc + i.quantity, 0)
-
-        if(!page){
-            page = 1
-        }
-
-        if(!limit){
-            limit = 10
-        }
-
-        let filter = {}
-        if(query && query !== ''){
-            filter = {category: query}
-        }
-
-        switch(sort){
-            case 'asc':
-                sort = {'price': 1}
-                break
-            case 'desc':
-                sort = {'price': -1}
-                break
-            default:
-                sort = undefined
-                break
-        }
+        let {page = 1, limit = 10, query, sort} = req.query
+        const dataUser = req.session.user._id
 
         try {
-            let {
+            const user = await userModel.findById(dataUser)
+
+            const isAdmin = user.role === 'admin'
+            const isUser = user.role === 'user'
+            const isPremium = user.role === 'premium'
+            const username = user.username
+            const userCart = req.session.user.cart
+            const email = user.email
+
+            const cartUser = await cartModel
+                                    .findById(userCart)
+                                    .populate(
+                                            'products.pid',
+                                            '_id title price description category code stock thumbnail'
+                                    )
+                                    .lean()
+            const totalQuantity = cartUser.products.reduce((acc, i) => acc + i.quantity, 0)
+
+            let filter = {}
+            if(query && query !== ''){
+                filter = {category: query}
+            }
+
+            let sortOpt = {}
+            switch(sort){
+                case 'asc':
+                    sortOpt = {'price': 1}
+                    break
+                case 'desc':
+                    sortOpt = {'price': -1}
+                    break
+                default:
+                    sortOpt = undefined
+                    break
+            }
+
+            const result = await productModel.paginate(filter, {limit, page: Number(page), sort: sortOpt, lean: true}) 
+            const {
                 docs: products,
-                tPages,
+                totalPages: tPages,
                 prevPage,
                 nextPage,
-                page,
+                page: currentPage,
                 hasPrevPage,
                 hasNextPage
-            } = await productModel.paginate(filter, {limit: limit, page: page, lean: true})
+            } = result
 
             let welcomeMessage = ''
             if(req.session.user){
                 try {
-                    const user = await UserDAO.getUserByFilter({username: req.session.user.username})
+                    const user = await userDAO.getUserBy({username: req.session.user.username})
                     if(user.role === 'admin'){
-                        welcomeMessage = `Bienvenido ${user.username}. Eres un administrador`
+                        welcomeMessage = `Bienvenido/a ${user.username}. Eres un administrador`
                     } else if(user.role === 'premium'){
-                        welcomeMessage = `Bienvenido ${user.username}. Eres un premium`
+                        welcomeMessage = `Bienvenido/a ${user.username}. Eres un premium`
                     } else{
-                        welcomeMessage = `Bienvenido ${user.username}.`
+                        welcomeMessage = `Bienvenido/a ${user.username}.`
                     }
                 } catch (error) {
                     req.logger.error(`Error al obtener información del usuario: ${error}`)
                 }
             }
+
             res.setHeader("Content-Type", "text/html");
-            res.status(200).render('home', {
+            res.status(200).render('products', {
                 status: 'success',
                 payload: products,
                 user, email, username,
                 totalQuantity, userCart,
                 isPremium, isAdmin, isUser,
                 tPages, prevPage, nextPage,
-                page, hasPrevPage, hasNextPage,
+                page: currentPage, hasPrevPage, hasNextPage,
                 prevLink: page > 1 ? `/?page=${page - 1}` : null,
                 nextLink: page < tPages ? `/?page=${page + 1}` : null,
                 products, welcomeMessage
             })
         } catch (error) {
-            req.logger.error(error);
+            req.logger.error(`Error al obtener los productos 2: ${error.message}`);
             res.status(500).send('Error interno');
         }
     }
@@ -114,7 +116,7 @@ class ViewsController{
             const carts = await cartModel
                                 .find()
                                 .populate(
-                                        'products.product',
+                                        'products.pid',
                                         '_id title price description category code stock thumbnail'
                                 )
                                 .lean()
@@ -128,7 +130,7 @@ class ViewsController{
                 }
             )
         } catch (error) {
-            req.logger.error(error)
+            req.logger.error(`Error al obtener los carritos: ${error.message}`)
             res.status(500).send('Error interno')
         }
     }
@@ -148,7 +150,7 @@ class ViewsController{
         const userCart = await cartModel
                                 .findById(cid)
                                 .populate(
-                                        'products.product',
+                                        'products.pid',
                                         '_id title price description category code stock thumbnail'
                                 )
                                 .lean()
@@ -177,7 +179,7 @@ class ViewsController{
             res.setHeader("Content-Type", "text/html")
             res.render('productdetail', {product, user, isAdmin, userCart, email})
         } catch (error) {
-            req.logger.error(error)
+            req.logger.error(`Error al obtener el producto con ID ${pid}: ${error.message}`)
             res.status(500).send('Error al procesar la solicitud')
         }
     }
@@ -190,7 +192,7 @@ class ViewsController{
             const cart = await cartModel
                                 .findById(cid)
                                 .populate(
-                                    'products.product',
+                                    'products.pid',
                                     '_id title price description category code stock thumbnail'
                                 )
                                 .lean()
@@ -216,6 +218,13 @@ class ViewsController{
     static async getRegister(req, res){
         let {message, error} = req.query
         res.status(200).render('register', {message, error})
+    }
+
+    static async getProfile(req, res){
+        if(!req.session.user){
+            return res.redirect('/login')
+        }
+        res.render('profile', {user: req.session.user})
     }
 
     static async getRealTimeProducts(req, res){
@@ -245,7 +254,7 @@ class ViewsController{
         const userCart = await cartModel
                                 .findById(cid)
                                 .populate(
-                                        'products.product',
+                                        'products.pid',
                                         '_id title price description category code stock thumbnail'
                                 )
                                 .lean()
@@ -310,7 +319,7 @@ class ViewsController{
             const users = await userModel.find().lean()
             res.status(200).render('adminusers', {users})
         } catch (error) {
-            req.logger.error(error)
+            req.logger.error(`Error al obtener los usuarios de los admin: ${error.message}`)
             res.status(500).send('Error interno')
         }
     }
@@ -325,7 +334,7 @@ class ViewsController{
                 res.status(404).send('No se encontró ticket para el usuario')
             }
         } catch (error) {
-            req.logger.error(error)
+            req.logger.error(`Error al obtener los detalles: ${error.message}`)
             res.status(500).send('Error interno')
         }
     }

@@ -15,8 +15,8 @@ const admin = (req, res, next) => {
 }
 
 const user = (req, res, next) => {
-    if (req.session.usuario.rol === 'admin') {
-        return res.redirect(`http://localhost:${config.PORT}/realTimeProducts`)
+    if (req.session.user.role === 'admin') {
+        return res.redirect(`http://localhost:${config.PORT}/realtimeproducts`)
     }
     next()
 }
