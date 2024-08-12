@@ -1,13 +1,12 @@
 const productModel = require('../dao/models/productModel')
 const userModel = require('../dao/models/userModel')
 const ProductRepository = require('../services/repository/productRepository')
-const routes = require('../utils/utils')
 const sendEmail = require('../config/sendEmail')
 
-const routeProducts =  routes.products
+const productRepository = new ProductRepository()
 
 class ProductController{    
-    static async getAllProducts(req, res){
+    static async getProducts(req, res){
         let {page = 1, limit = 10, query, sort} = req.query
 
         let filter = {}
@@ -33,7 +32,7 @@ class ProductController{
                 tPages,
                 prevPage,
                 nextPage,
-                page,
+                page: currentPage,
                 hasPrevPage,
                 hasNextPage
             } = await productModel.paginate(filter, {limit: limit, page: page, sort: sort, lean: true})
@@ -44,7 +43,7 @@ class ProductController{
                 tPages: tPages,
                 prevPage: prevPage,
                 nextPage: nextPage,
-                page: page,
+                page: currentPage,
                 hasPrevPage: hasPrevPage,
                 hasNextPage: hasNextPage,
                 prevLink: page > 1 ? `/?page=${page - 1}` : null,
@@ -59,7 +58,7 @@ class ProductController{
     static async getProductById(req, res){
         const {pid} = req.params
         try {
-            const product = await ProductRepository.getProductById(pid)
+            const product = await productRepository.getProductById(pid)
             res.json({product})
         } catch (error) {
             req.logger.error(`Error al obtener el producto con ID ${pid}: ${error.message}`)
@@ -70,19 +69,32 @@ class ProductController{
     static async addProduct(req, res){
         try {
             const productData = req.body
-            const email = req?.user?.email || productData.email
-            let user = await userModel.findOne({email: email})
-            let owner = user.email
 
-            if(user.role === 'premium'){
+            const email = req?.user?.email || productData.email
+
+            let user = await userModel.findOne({email: email})
+
+            let owner = user._id
+
+            if(user.role === 'premium' || user.role === 'admin'){
                 productData.owner = owner
             }
 
-            await ProductRepository.addProduct(productData)
-            res.status(201).json({message: 'Producto creado'})
+            const existingCode = await productModel.findOne({code: productData.code})
+            if(existingCode){
+                throw new Error('Code existente')
+            }
+
+            await productRepository.addProduct(productData)
+
+            res.status(201).json({message: `Producto creado con éxito`})
         } catch (error) {
-            req.logger.error(`Error al crear el producto: ${error.message}`)
-            res.status(400).json({error: error.message}) 
+            if (error.message === "Code existente") {
+                res.status(400).json({ error: 'El código del producto ya existe' });
+            } else {
+                req.logger.error(`Error al crear el producto: ${error.message}`)
+                res.status(400).json({error: error.message}) 
+            }
         }
     }
 
@@ -91,7 +103,7 @@ class ProductController{
         const updatedFields = req.body
 
         try {
-            await ProductRepository.updateProduct(pid, updatedFields)
+            await productRepository.updateProduct(pid, updatedFields)
             res.json({message: 'Producto actualizado con éxito'})
         } catch (error) {
             req.logger.error(`Error al actualizar el producto con ID ${pid}: ${error.message}`)
@@ -103,15 +115,20 @@ class ProductController{
         const {pid} = req.params
 
         try {
-            const product = await ProductRepository.getProductById(pid)
+            const product = await productRepository.getProductById(pid)
             if(!product){
-                return res.status(404).json({error: 'No se encontró al propietario del producto'})
+                return res.status(404).json({error: 'Producto no encontrado'})
             }
 
-            if(owner.role === 'premium'){
+            const owner = await userModel.findById(product.owner)
+            if(!owner){
+                return res.status(404).json({ error: 'Propietario del producto no encontrado' })
+            }
+
+            if(owner.role === 'premium' || owner.role === 'admin'){
                 const subject = 'Producto eliminado'
                 const msg = `
-                <p>Estimado ${owner.first__name},</p>
+                <p>Estimado ${owner.surname},</p>
                 <p>Le informamos que su producto <strong>${product.title}</strong> ha sido eliminado de nuestra plataforma.</p>
                 <p>Saludos,</p>
                 <p>El equipo de E-commerce</p>
@@ -119,7 +136,7 @@ class ProductController{
                 await sendEmail(owner.email, subject, msg)
             }
 
-            await ProductRepository.deleteProduct(pid)
+            await productRepository.deleteProduct(pid)
             res.json({message: 'Producto eliminado con éxito'})
         } catch (error) {
             req.logger.error(`Error al eliminar el producto con ID ${pid}: ${error.message}`)

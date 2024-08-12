@@ -8,10 +8,17 @@ const productSchema = new mongoose.Schema(
         description: String,
         price: {type: Number, required: true},
         thumbnail: String,
-        code: String,
+        code: {type: String, required: true, unique: true},
         stock: {type: Number, required: true},
         status: Boolean,
-        category: String
+        category: String,
+        quantity: {type: Number, default: 1},
+        owner: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'users',
+            required: [false],
+            default: null
+        }
     },{
         timestamps: true
     }

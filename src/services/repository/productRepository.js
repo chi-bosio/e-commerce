@@ -10,19 +10,20 @@ class ProductRepository{
     }
 
     async addProduct(productData){
-        return await this.productDAO.addProduct(productData)
+        const {title, description, price, thumbnail, code, stock, category, status, owner} = productData
+        return await this.productDAO.addProduct(title, description, price, thumbnail, code, stock, category, status, owner)
     }
 
-    async getProductById(id){
-        return await this.productDAO.getProductById(id)
+    async getProductById(pid){
+        return await this.productDAO.getProductById(pid)
     }
 
-    async updateProduct(id, updatedFields){
-        return await this.productDAO.updateProduct(id, updatedFields)
+    async updateProduct(pid, updatedFields){
+        return await this.productDAO.updateProduct(pid, updatedFields)
     }
 
-    async deleteProducts(id){
-        return await this.productDAO.deleteProducts(id)
+    async deleteProduct(pid){
+        return await this.productDAO.deleteProduct(pid)
     }
 
     async getProductFiltered(category = null){

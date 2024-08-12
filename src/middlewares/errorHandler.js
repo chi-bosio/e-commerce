@@ -1,14 +1,14 @@
-const customError = require('../services/errors/customError')
+const errorList = require('../services/errors/errorList')
 const logger = require('../config/logger')
 
 function errorHandler(error, req, res, next){
-    req.logger.error('Error detectado entrando al ErrorHandler:')
-    req.logger.error(`Name: ${error.name}`)
-    req.logger.error(`Code: ${error.code}`)
-    req.logger.error(`Message: ${error.message}`)
+    logger.error('Error detectado entrando al ErrorHandler:')
+    logger.error(`Name: ${error.name}`)
+    logger.error(`Code: ${error.code}`)
+    logger.error(`Message: ${error.message}`)
 
     if(error.additionalInfo){
-        req.logger.error(`Additional Info: ${error.additionalInfo}`)
+        logger.error(`Additional Info: ${error.additionalInfo}`)
     }
 
     switch(error.errorCode){

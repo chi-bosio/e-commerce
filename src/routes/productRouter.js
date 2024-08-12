@@ -3,7 +3,7 @@ const ProductController = require('../controller/productController')
 const Router=require('express').Router;
 const router=Router()
 
-router.get('/', ProductController.getAllProducts)
+router.get('/', ProductController.getProducts)
   
 router.get('/:pid', ProductController.getProductById)
 

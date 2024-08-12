@@ -28,7 +28,7 @@ class CartDAO{
         }
     }
     
-    async addProductToCart(cid, pid) {
+    async addProductToCart(cid, pid, quantity) {
         
         try {
             let carts = await cartModel.findById(cid);
@@ -37,19 +37,19 @@ class CartDAO{
                 return { error: `Carrito con ID ${cid} no encontrado`};
             }
 
-            const existingProduct = carts.products.find(p => p.product === pid);
+            const existingProduct = carts.products.find(p => p.pid === pid);
             
             if (existingProduct) {
-                existingProduct.quantity++;
+                existingProduct.quantity += quantity;
             } else {
                 carts.products.push({
-                    product: pid,
+                    pid: pid,
                     quantity: 1
                 });
             }
             await carts.save()
 
-            return carts.products.find(p => p.product === pid)
+            return carts
         } catch (error) {
             throw new Error("Error al crear el producto en el carrito: " + error.message);
         }

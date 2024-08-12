@@ -4,101 +4,121 @@ const productModel = require('./models/productModel')
 const userModel = require('./models/userModel')
 
 class TicketDAO {
-    async createTicket(uid, cid){
+    async createTicket(uid, cid) {
         try {
-            const cart = await cartModel.findOne({_id: cid})
-            if(!cart || cart.products.length === 0){
-                throw new Error('No existen productos en el carrito para crear el ticket')
+
+            const cart = await cartModel.findOne({_id: cid});
+
+            if (!cart || cart.products.length === 0) {
+                throw new Error('No existen productos en el carrito para crear el ticket');
             }
 
-            const {availableProducts, unavailableProducts} = await this.checkStock(cart.products)
-            if(availableProducts.length === 0){
+            const { availableProducts, unavailableProducts } = await this.checkStock(cart.products)
+
+            if (availableProducts.length === 0) {
                 throw new Error('Stock insuficiente')
             }
 
             const user = await userModel.findById(uid)
+
+            const totalAmount = this.calculateTotalAmount(availableProducts)
+
             const ticket = new ticketModel({
                 purchase_datetime: new Date(),
-                amount: this.calculateTotalAmount(availableProducts),
+                amount: totalAmount,
                 purchaser: uid,
-                products: availableProducts
-            })
+                products: availableProducts.map(p => ({
+                    product: p.product._id,
+                    quantity: p.quantity
+                }))
+            });
+
             await ticket.save()
+
             await this.updateStock(availableProducts)
 
             await cartModel.findOneAndUpdate({_id: cid}, {$set: {products: unavailableProducts}})
-            return {ticket, unavailableProducts}
+
+            return { ticket, unavailableProducts };
         } catch (error) {
-            req.logger.error(`Error al crear el ticket: ${error.message}`)
-            throw new Error('Error al crear el ticket. Consultar registros para más información.')
+            throw new Error(`Error al crear el ticket: ${error.message}`);
         }
     }
 
     async checkStock(products){
         try {
-            const availableProducts = []
-            const unavailableProducts = []
 
-            for(const i of products){
-                const product = await productModel.findById(i.product)
-                if(product && product.stock >= i.quantity){
-                    availableProducts.push(i)
-                } else{
+            const availableProducts = [];
+            const unavailableProducts = [];
+
+            for (const i of products) {
+                const productId = i.pid;
+
+                const product = await productModel.findById(productId)
+
+                if (product && product.stock >= i.quantity) {
+                    availableProducts.push({ ...i, product });
+                } else {
                     unavailableProducts.push({
-                        product: i.product,
+                        pid: productId,
                         quantity: product ? i.quantity - product.stock : i.quantity 
-                    })
+                    });
                 }
             }
-            return {availableProducts, unavailableProducts}
+
+            return { availableProducts, unavailableProducts };
         } catch (error) {
-            req.logger.error(`Error al verificar stock: ${error.message}`)
-            throw error
+            console.error(`Error al verificar el stock: ${error.message}`);
+            throw new Error(`Error al verificar el stock: ${error.message}`);
         }
     }
-
+    
     async updateStock(products){
         try {
-            for(const i of products){
-                await productModel.findByIdAndUpdate(i.product._id, {$inc: {stock: -i.quantity}})
+            for (const product of products) {
+                await productModel.findByIdAndUpdate(product.pid, { $inc: { stock: -product.quantity } });
             }
         } catch (error) {
-            req.logger.error(`Error al actualizar stock: ${error.message}`)
-            throw error
+            throw new Error(`Error al actualizar el stock: ${error.message}`);
         }
     }
 
     async getLatestTicketByUser(uid) {
         try {
-            const latestTicket = await ticketModel.findOne({ purchaser: uid }).sort({ createdAt: -1 }).lean();
+            const latestTicket = await ticketModel.findOne({ purchaser: uid }).sort({ createdAt: -1 }).lean()
             return latestTicket;
         } catch (error) {
-            req.logger.error(`Error al obtener el último ticket del usuario: ${error.message}`)
-            throw error
+            throw new Error(`Error al obtener el último ticket del usuario: ${error.message}`);
         }
     }
 
     async getTicketsByUser(uid) {
         try {
-            const user = await userModel.findById(uid);
+            const user = await userModel.findById(uid)
             if (!user) {
-                return [];
+                return []
             }
 
-            const tickets = await ticketModel.find({ purchaser: user.email });
+            const tickets = await ticketModel.find({ purchaser: user.email })
             return tickets;
         } catch (error) {
-            req.logger.error(`Error al obtener los tickets: ${error.message}`)
-            throw error
+            throw new Error(`Error al obtener los tickets: ${error.message}`)
         }
     }
 
     calculateTotalAmount(products) {
-        return products.reduce((total, i) => {
-            const price = i.product.price;
-            const quantity = i.quantity;
-            return total + price * quantity;
-        }, 0);
+        try {
+            let total = 0;
+            for (const product of products) {
+                if (!product.product || !product.product.price || !product.quantity) {
+                    throw new Error('Datos de producto inválidos para el cálculo');
+                }
+                total += product.product.price * product.quantity;
+            }
+            return total;
+        } catch (error) {
+            throw new Error(`Error al calcular el total: ${error.message}`)
+        }
     }
 }
 

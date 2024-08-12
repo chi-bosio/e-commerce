@@ -22,7 +22,7 @@ class SessionController{
 
         try {
             res.setHeader('Content-Type', 'application/json')
-            res.redirect(`http://localhost:${config.PORT}/`)
+            res.json('Registro exitoso!')
         } catch (error) {
             req.logger.error(`Error al realizar el registro: ${error.message}`)
             return res.status(400).json({error: 'Error inesperado'})
@@ -59,7 +59,7 @@ class SessionController{
         userRepository.updateLastConnection(user._id)
 
         res.setHeader('Content-Type', 'application/json')
-        res.status(200).redirect('/')
+        res.json({message: "login exitoso!!", cartId: user.cart})
     }
 
     static async githubError(req, res){

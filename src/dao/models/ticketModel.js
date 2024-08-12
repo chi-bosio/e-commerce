@@ -17,11 +17,23 @@ const ticketSchema = new mongoose.Schema(
             required: true
         },
         purchaser: {
-            type: String, 
+            type: mongoose.Schema.Types.ObjectId, // Asumiendo que purchaser es un ID de usuario
+            ref: 'User',
             required: true
-        }
-    },{timestamps: true}
-)
+        },
+        products: [{
+            product: {
+                type: mongoose.Schema.Types.ObjectId, // Referencia al ID del producto
+                ref: 'Product'
+            },
+            quantity: {
+                type: Number,
+                required: true
+            }
+        }]
+    },
+    { timestamps: true }
+);
 
 ticketSchema.pre('save', async (next) => {
     const ticket = this
